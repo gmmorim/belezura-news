@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -47,6 +47,17 @@ export function LivePreviewModal({
 }: LivePreviewModalProps) {
   const [deviceMode, setDeviceMode] = useState<"mobile" | "desktop">("desktop");
 
+  // Trava a rolagem da página do fundo (painel) quando o modal estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   // Imagem ativa dependendo do modo selecionado
@@ -73,10 +84,10 @@ export function LivePreviewModal({
         initial={{ scale: 0.96, opacity: 0, y: 15 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 15 }}
-        className="relative z-10 w-full max-w-6xl max-h-[95vh] bg-[#FAF9F6] text-neutral-900 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-neutral-700/50"
+        className="relative z-10 w-full max-w-6xl h-[92vh] max-h-[95vh] bg-[#FAF9F6] text-neutral-900 rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-neutral-700/50"
       >
         {/* Topbar do Simulador (Controles de Dispositivo & Publicação) */}
-        <div className="bg-neutral-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between border-b border-neutral-800">
+        <div className="bg-neutral-900 text-white px-4 sm:px-6 py-3 flex items-center justify-between border-b border-neutral-800 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-semibold uppercase tracking-wider text-neutral-300">
@@ -136,13 +147,13 @@ export function LivePreviewModal({
           </div>
         </div>
 
-        {/* Viewport do Preview com Scroll */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-neutral-200/50">
+        {/* Viewport do Preview com Scroll e Overscroll-contain */}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-8 flex justify-center items-start bg-neutral-200/50">
           <div
-            className={`transition-all duration-300 bg-[#FAF9F6] shadow-xl rounded-2xl overflow-hidden border border-neutral-300/80 ${
+            className={`transition-all duration-300 bg-[#FAF9F6] shadow-xl rounded-2xl overflow-hidden border border-neutral-300/80 my-auto sm:my-0 ${
               deviceMode === "mobile"
                 ? "w-[390px] min-h-[780px]"
-                : "w-full max-w-4xl min-h-[600px]"
+                : "w-full max-w-4xl min-h-[600px] overflow-y-auto overscroll-contain"
             }`}
           >
             {/* Header Simulado */}

@@ -9,15 +9,16 @@ import {
   Search,
   Mail,
   ArrowRight,
-  Sparkles,
   Lock,
 } from "lucide-react";
 import { AnimatedHeaderLogo } from "./AnimatedHeaderLogo";
 import { CATEGORIES } from "./CategoryNav";
+import { NewsletterModal } from "./NewsletterModal";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [newsletterModalOpen, setNewsletterModalOpen] = useState(false);
 
   // Data formatada no padrão editorial
   const todayFormatted = new Intl.DateTimeFormat("pt-BR", {
@@ -44,13 +45,14 @@ export function Header() {
 
             {/* Links rápidos e acesso ao painel */}
             <div className="flex items-center gap-4 sm:gap-6">
-              <Link
-                href="/newsletter"
-                className="hidden sm:inline-flex items-center gap-1.5 text-neutral-600 hover:text-[#ff6305] transition-colors"
+              <button
+                type="button"
+                onClick={() => setNewsletterModalOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 text-neutral-600 hover:text-[#ff6305] transition-colors cursor-pointer"
               >
                 <Mail className="w-3.5 h-3.5 text-[#ff6305]" />
                 <span>Receba nossa curadoria</span>
-              </Link>
+              </button>
 
               <div className="h-3 w-px bg-neutral-200 hidden sm:block" />
 
@@ -109,18 +111,10 @@ export function Header() {
 
               <a
                 href="mailto:comercial@belezuranews.com.br"
-                className="hidden lg:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border border-neutral-300/80 text-neutral-800 hover:border-[#ff6305] hover:text-[#ff6305] transition-all duration-200"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full border border-neutral-300/80 text-neutral-800 hover:border-[#ff6305] hover:text-[#ff6305] transition-all duration-200"
               >
                 <span>Anuncie</span>
               </a>
-
-              <Link
-                href="/newsletter"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#ff6305] text-white shadow-sm shadow-orange-500/20 hover:bg-orange-600 active:scale-[0.98] transition-all duration-200 shrink-0"
-              >
-                <Sparkles className="w-3 h-3 hidden xs:block" />
-                <span>Assinar</span>
-              </Link>
             </div>
           </div>
 
@@ -234,24 +228,33 @@ export function Header() {
               {/* Rodapé do Drawer com CTA de Newsletter */}
               <div className="p-4 bg-neutral-50 border-t border-neutral-100">
                 <p className="text-xs font-semibold text-neutral-800 mb-2">
-                  Assine o Belezura Drops
+                  Receba o Belezura Drops
                 </p>
                 <p className="text-[11px] text-neutral-500 mb-3">
                   As principais notícias de beleza, moda e negócios no seu email toda manhã.
                 </p>
-                <Link
-                  href="/newsletter"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-orange-600 transition-colors"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setNewsletterModalOpen(true);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-orange-600 transition-colors cursor-pointer"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Cadastrar Gratuitamente</span>
-                </Link>
+                </button>
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+
+      {/* Modal de Inscrição na Newsletter */}
+      <NewsletterModal
+        isOpen={newsletterModalOpen}
+        onClose={() => setNewsletterModalOpen(false)}
+      />
     </>
   );
 }

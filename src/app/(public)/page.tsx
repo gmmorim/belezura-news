@@ -14,8 +14,11 @@ export default function HomePage() {
           
           {/* Matéria de Capa Principal (8 Colunas no Desktop) */}
           <div className="w-full lg:col-span-8 group cursor-pointer">
-            {/* Card Dinâmico com Altura Adaptável (Sem largura fixa e sem aspect-ratio cortando texto) */}
-            <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200/80 shadow-sm min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] flex flex-col justify-end">
+            {/* Card Dinâmico com Altura Adaptável */}
+            <Link
+              href="/post/minimalismo-botanico-skincare-luxo"
+              className="block relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200/80 shadow-sm min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] flex flex-col justify-end"
+            >
               {/* Background com imagem responsiva */}
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
@@ -57,7 +60,7 @@ export default function HomePage() {
                   Como marcas consolidadas e laboratórios franceses estão resgatando ativos naturais para criar fórmulas ultraconcentradas.
                 </p>
               </div>
-            </div>
+            </Link>
 
             {/* Crédito obrigatório de fonte abaixo da imagem */}
             <div className="mt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1.5 px-1">
@@ -91,33 +94,38 @@ export default function HomePage() {
             {/* Lista de Matérias Secundárias */}
             {[
               {
+                slug: "fusoes-gigantes-cosmeticos-brasil",
                 category: "Business",
                 title: "Fusões milionárias: gigantes de cosméticos aceleram aquisições no Brasil.",
                 time: "Há 2 horas",
                 tagColor: "bg-neutral-900 text-white",
               },
               {
+                slug: "retorno-alfaiataria-desconstruida-milao",
                 category: "Fashion",
                 title: "O retorno da alfaiataria desconstruída nas passarelas de Milão.",
                 time: "Há 4 horas",
                 tagColor: "bg-[#ff6305] text-white",
               },
               {
+                slug: "minimalismo-botanico-skincare-luxo",
                 category: "Reviews",
                 title: "Testamos o protetor solar com efeito primer que virou febre no TikTok.",
                 time: "Há 6 horas",
                 tagColor: "bg-emerald-700 text-white",
               },
               {
+                slug: "tratamentos-esteticos-nao-invasivos-sp",
                 category: "Lifestyle",
                 title: "O retiro de bem-estar nos alpes suíços que atrai executivas de moda.",
                 time: "Ontem",
                 tagColor: "bg-purple-800 text-white",
               },
             ].map((item, idx) => (
-              <article
+              <Link
                 key={idx}
-                className="w-full p-4 rounded-2xl bg-white border border-neutral-200/80 hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden"
+                href={`/post/${item.slug}`}
+                className="block w-full p-4 rounded-2xl bg-white border border-neutral-200/80 hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden group"
               >
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <span
@@ -130,7 +138,7 @@ export default function HomePage() {
                 <h3 className="font-sans font-bold text-sm sm:text-base text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
                   {item.title}
                 </h3>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -166,6 +174,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
             {[
               {
+                slug: "tratamentos-esteticos-nao-invasivos-sp",
                 category: "Beauty",
                 title: "Os 5 tratamentos estéticos não invasivos mais procurados em clínicas de SP.",
                 desc: "Tecnologia de ultrassom microfocado e bioestimuladores lideram as preferências.",
@@ -176,6 +185,7 @@ export default function HomePage() {
                 date: "13 Out 2026",
               },
               {
+                slug: "fusoes-gigantes-cosmeticos-brasil",
                 category: "Business",
                 title: "Como a Geração Z está moldando a estratégia das maiores marcas de perfume.",
                 desc: "Fragrâncias agênero e embalagens recarregáveis deixaram de ser nicho para virar regra.",
@@ -186,6 +196,7 @@ export default function HomePage() {
                 date: "12 Out 2026",
               },
               {
+                slug: "retorno-alfaiataria-desconstruida-milao",
                 category: "Lifestyle",
                 title: "A rotina matinal das fundadoras de startups de beleza que faturam milhões.",
                 desc: "Descubra os hábitos, leituras e rituais de foco que orientam as mentes à frente do setor.",
@@ -200,7 +211,7 @@ export default function HomePage() {
                 key={i}
                 className="w-full group flex flex-col bg-[#FAF9F6] rounded-2xl overflow-hidden border border-neutral-200/80 hover:shadow-lg transition-all duration-300"
               >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-100">
+                <Link href={`/post/${card.slug}`} className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
                     style={{ backgroundImage: `url('${card.img}')` }}
@@ -210,7 +221,7 @@ export default function HomePage() {
                       {card.category}
                     </span>
                   </div>
-                </div>
+                </Link>
 
                 {/* Crédito obrigatório de fonte abaixo da imagem */}
                 <div className="px-5 pt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
@@ -233,7 +244,9 @@ export default function HomePage() {
                       <span>{card.date}</span>
                     </div>
                     <h3 className="font-recoleta text-lg sm:text-xl font-bold text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
-                      {card.title}
+                      <Link href={`/post/${card.slug}`}>
+                        {card.title}
+                      </Link>
                     </h3>
                     <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed break-words">
                       {card.desc}
@@ -241,9 +254,12 @@ export default function HomePage() {
                   </div>
 
                   <div className="pt-4 mt-4 border-t border-neutral-200/60 flex items-center justify-between">
-                    <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <Link
+                      href={`/post/${card.slug}`}
+                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                    >
                       Ler matéria completa <ArrowUpRight className="w-3.5 h-3.5" />
-                    </span>
+                    </Link>
                     <button
                       type="button"
                       aria-label="Salvar notícia"

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,8 +13,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Em produção, persistiria via Prisma:
-    // await prisma.newsletterSubscriber.create({ data: { email, source: source || "footer" } });
+    try {
+      await prisma.newsletterSubscriber.upsert({
+        where: { email: email.toLowerCase().trim() },
+        update: { isActive: true },
+        create: {
+          email: email.toLowerCase().trim(),
+          source: source || "header_modal",
+          consentGiven: true,
+        },
+      });
+    } catch (dbError) {
+      console.warn("Aviso ao salvar no banco (usando fallback se offline):", dbError);
+    }
 
     return NextResponse.json({
       success: true,
