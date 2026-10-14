@@ -4,17 +4,17 @@ import { internalViewsStore, internalViewLogs } from "@/lib/views-store";
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
-  return handleIncrementView(request, params.slug);
+  return handleIncrementView(request, params.id);
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
   // Suporte a requisições sendBeacon que chegam como POST ou GET
-  return handleIncrementView(request, params.slug);
+  return handleIncrementView(request, params.id);
 }
 
 function handleIncrementView(request: NextRequest, slug: string) {

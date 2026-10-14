@@ -17,6 +17,8 @@ import {
   Radio,
   X,
   Plus,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { LivePreviewModal, PostFormData } from "@/components/admin/LivePreviewModal";
 
@@ -53,7 +55,12 @@ function NewPostForm() {
   const [tagInput, setTagInput] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [radarNotice, setRadarNotice] = useState<string | null>(null);
+
+  // Estados de feedback assíncrono (Toast / Alertas)
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Efeito para preencher automaticamente quando vier do Radar Google News
   useEffect(() => {
@@ -92,14 +99,65 @@ function NewPostForm() {
     }));
   };
 
-  // Salvar ou Publicar
-  const handleSubmit = (targetStatus: "DRAFT" | "PUBLISHED") => {
-    setFormData((prev) => ({ ...prev, status: targetStatus }));
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-      router.push("/admin/posts");
-    }, 1200);
+  // Salvar ou Publicar com persistência real na API e feedback visual
+  const handleSubmit = async (targetStatus: "DRAFT" | "PUBLISHED") => {
+    setSubmitError(null);
+
+    // Validações imediatas de UX antes da chamada de rede
+    if (!formData.title || formData.title.trim().length < 5) {
+      setSubmitError("O título da matéria deve conter pelo menos 5 caracteres.");
+      return;
+    }
+
+    if (!formData.content || formData.content.trim().length < 10) {
+      setSubmitError("O conteúdo da matéria deve conter pelo menos 10 caracteres.");
+      return;
+    }
+
+    if (!formData.imageWeb || !formData.imageWeb.startsWith("http")) {
+      setSubmitError("A imagem de capa para Desktop deve ser uma URL válida (ex: https://images.unsplash.com/...).");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const payload = {
+        ...formData,
+        status: targetStatus,
+      };
+
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setSavedSuccess(true);
+        setSuccessMessage(
+          targetStatus === "PUBLISHED"
+            ? "Matéria publicada com sucesso no portal!"
+            : "Rascunho salvo com sucesso!"
+        );
+        setTimeout(() => {
+          router.push("/admin/posts");
+        }, 1500);
+      } else {
+        const errorMsg =
+          data.error ||
+          (data.details && JSON.stringify(data.details)) ||
+          "Ocorreu um erro ao salvar a matéria no banco de dados.";
+        setSubmitError(errorMsg);
+      }
+    } catch (err: any) {
+      console.error("[SUBMIT_ERROR]", err);
+      setSubmitError("Erro de comunicação com o servidor ao persistir a matéria. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -136,23 +194,66 @@ function NewPostForm() {
 
           <button
             type="button"
+            disabled={submitting}
             onClick={() => handleSubmit("DRAFT")}
-            className="hidden xs:inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold transition-colors"
+            className="hidden xs:inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold transition-colors disabled:opacity-50"
           >
-            <FileCheck className="w-4 h-4" />
-            <span>Salvar Rascunho</span>
+            {submitting ? (
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+            ) : (
+              <FileCheck className="w-4 h-4" />
+            )}
+            <span>{submitting ? "Salvando..." : "Salvar Rascunho"}</span>
           </button>
 
           <button
             type="button"
+            disabled={submitting}
             onClick={() => handleSubmit("PUBLISHED")}
-            className="font-alleron flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95"
+            className="font-alleron flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95 disabled:opacity-50"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Publicar</span>
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Publicando...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Publicar</span>
+              </>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Alerta de Sucesso (Toast) */}
+      {savedSuccess && (
+        <div className="p-4 rounded-2xl bg-emerald-950/90 border border-emerald-500/50 text-emerald-300 flex items-center gap-3 text-sm font-semibold animate-fade-in shadow-2xl">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span>{successMessage} Redirecionando para a lista de matérias...</span>
+        </div>
+      )}
+
+      {/* Alerta de Erro com Campo Específico (Toast) */}
+      {submitError && (
+        <div className="p-4 rounded-2xl bg-red-950/90 border border-red-500/60 text-red-200 flex items-start justify-between gap-3 text-sm animate-fade-in shadow-2xl">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-red-300">Falha ao salvar a postagem:</p>
+              <p className="text-xs text-red-200/90 mt-1 leading-relaxed">{submitError}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSubmitError(null)}
+            className="text-red-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Alerta de Pauta Vinda do Radar Google News */}
       {radarNotice && (
@@ -439,11 +540,21 @@ function NewPostForm() {
           </button>
           <button
             type="button"
+            disabled={submitting}
             onClick={() => handleSubmit("PUBLISHED")}
-            className="flex-1 py-3 rounded-xl bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5"
+            className="flex-1 py-3 rounded-xl bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>Publicar</span>
+            {submitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Publicando...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Publicar</span>
+              </>
+            )}
           </button>
         </div>
       </div>

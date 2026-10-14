@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Users,
   ShieldCheck,
@@ -10,8 +10,13 @@ import {
   UserCheck,
   Trash2,
   Lock,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AlertDialog } from "@/components/admin/AlertDialog";
 
 interface TeamMember {
   id: string;
@@ -51,27 +56,129 @@ const INITIAL_TEAM: TeamMember[] = [
 
 export default function AdminUsuariosPage() {
   const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
+  const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [newMember, setNewMember] = useState({ name: "", email: "", role: "REDATOR" as "ADMIN" | "REDATOR" });
+  const [newMember, setNewMember] = useState({
+    name: "",
+    email: "",
+    role: "REDATOR" as "ADMIN" | "REDATOR",
+  });
+  const [isCreating, setIsCreating] = useState(false);
 
-  const handleAddMember = (e: React.FormEvent) => {
+  // Estados de Exclusão (AlertDialog) e Toast
+  const [deleteTarget, setDeleteTarget] = useState<TeamMember | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Carrega lista atualizada de usuários da API Prisma
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const res = await fetch("/api/users");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.users && data.users.length > 0) {
+            setTeam(data.users);
+          }
+        }
+      } catch (err) {
+        console.warn("Aviso ao carregar usuários da API:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadUsers();
+  }, []);
+
+  // Cadastrar novo membro via POST /api/users
+  const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMember.name || !newMember.email) return;
 
-    setTeam([
-      ...team,
-      {
-        id: String(Date.now()),
-        name: newMember.name,
-        email: newMember.email,
-        role: newMember.role,
-        postsCount: 0,
-        joinedDate: "Hoje",
-      },
-    ]);
+    setIsCreating(true);
 
-    setNewMember({ name: "", email: "", role: "REDATOR" });
-    setShowInviteModal(false);
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newMember),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setTeam((prev) => [
+          {
+            id: data.user.id,
+            name: data.user.name,
+            email: data.user.email,
+            role: data.user.role,
+            postsCount: 0,
+            joinedDate: "Hoje",
+          },
+          ...prev,
+        ]);
+        setToast({
+          type: "success",
+          text: `Membro ${data.user.name} adicionado com sucesso!`,
+        });
+        setNewMember({ name: "", email: "", role: "REDATOR" });
+        setShowInviteModal(false);
+      } else {
+        setToast({
+          type: "error",
+          text: data.error || "Falha ao cadastrar membro da redação.",
+        });
+      }
+    } catch {
+      setToast({
+        type: "error",
+        text: "Erro de comunicação ao salvar usuário. Tente novamente.",
+      });
+    } finally {
+      setIsCreating(false);
+      setTimeout(() => setToast(null), 5000);
+    }
+  };
+
+  // Confirmar Exclusão via DELETE /api/users/[id]
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(`/api/users/${deleteTarget.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setTeam((prev) => prev.filter((m) => m.id !== deleteTarget.id));
+        setToast({
+          type: "success",
+          text: `Usuário "${deleteTarget.name}" (${deleteTarget.email}) foi removido com sucesso.`,
+        });
+      } else {
+        setToast({
+          type: "error",
+          text:
+            data.error ||
+            "Não foi possível remover o usuário. Apenas administradores podem executar esta ação.",
+        });
+      }
+    } catch (err) {
+      console.error("[DELETE_USER_FRONTEND_ERROR]", err);
+      setToast({
+        type: "error",
+        text: "Erro de conexão ao tentar remover usuário. Tente novamente.",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+      setTimeout(() => setToast(null), 5000);
+    }
   };
 
   return (
@@ -101,6 +208,34 @@ export default function AdminUsuariosPage() {
           <span>Novo Membro</span>
         </button>
       </div>
+
+      {/* Toast de Notificação (Sucesso ou Erro 403) */}
+      {toast && (
+        <div
+          className={cn(
+            "p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm animate-fade-in shadow-xl",
+            toast.type === "success"
+              ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-300"
+              : "bg-red-950/90 border-red-500/60 text-red-200"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            {toast.type === "success" ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+            )}
+            <span className="font-medium">{toast.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-neutral-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Guia de Papéis de Negócio */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -169,12 +304,15 @@ export default function AdminUsuariosPage() {
           <div className="flex items-center gap-2 pt-2">
             <button
               type="submit"
-              className="font-alleron px-5 py-2.5 rounded-xl bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 transition-colors"
+              disabled={isCreating}
+              className="font-alleron px-5 py-2.5 rounded-xl bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
             >
-              Confirmar Cadastro
+              {isCreating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{isCreating ? "Salvando..." : "Confirmar Cadastro"}</span>
             </button>
             <button
               type="button"
+              disabled={isCreating}
               onClick={() => setShowInviteModal(false)}
               className="px-4 py-2.5 rounded-xl bg-neutral-800 text-neutral-400 hover:text-white text-xs font-medium"
             >
@@ -201,8 +339,8 @@ export default function AdminUsuariosPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between sm:justify-end gap-4 pl-14 sm:pl-0">
-              <span className="text-xs text-neutral-400">
+            <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 pl-14 sm:pl-0">
+              <span className="text-xs text-neutral-400 hidden xs:inline">
                 {member.postsCount} matérias publicadas
               </span>
 
@@ -216,10 +354,34 @@ export default function AdminUsuariosPage() {
               >
                 {member.role}
               </span>
+
+              {/* Botão de Excluir Usuário (Apenas ADMIN com confirmação) */}
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(member)}
+                className="p-2 rounded-xl bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 transition-colors"
+                title={`Remover ${member.name}`}
+                aria-label={`Remover ${member.name}`}
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal de Confirmação de Exclusão de Usuário (AlertDialog) */}
+      <AlertDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Remover Utilizador"
+        description="Tem a certeza de que deseja remover este utilizador? O acesso será revogado imediatamente."
+        itemBadge={deleteTarget ? `${deleteTarget.name} (${deleteTarget.email}) - Papel: ${deleteTarget.role}` : undefined}
+        confirmLabel="Sim, excluir"
+        cancelLabel="Cancelar"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

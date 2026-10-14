@@ -82,3 +82,52 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
+
+export interface AuthenticatedUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "REDATOR";
+}
+
+export async function getAuthenticatedUser(req?: any): Promise<AuthenticatedUser | null> {
+  // 1. Tenta recuperar sessão via getServerSession
+  try {
+    const { getServerSession } = await import("next-auth");
+    const session = await getServerSession(authOptions);
+    if (session?.user) {
+      return {
+        id: (session.user as any).id || "user-id",
+        name: session.user.name || "Usuário",
+        email: session.user.email || "",
+        role: ((session.user as any).role as "ADMIN" | "REDATOR") || "REDATOR",
+      };
+    }
+  } catch {
+    // Ignora e tenta o token JWT
+  }
+
+  // 2. Tenta recuperar via getToken (NextAuth JWT na requisição HTTP)
+  if (req) {
+    try {
+      const { getToken } = await import("next-auth/jwt");
+      const token = await getToken({
+        req,
+        secret: authOptions.secret,
+      });
+
+      if (token) {
+        return {
+          id: String(token.id || token.sub || "user-id"),
+          name: String(token.name || "Usuário"),
+          email: String(token.email || ""),
+          role: (token.role as "ADMIN" | "REDATOR") || "REDATOR",
+        };
+      }
+    } catch {
+      // Ignora erro
+    }
+  }
+
+  return null;
+}

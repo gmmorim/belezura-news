@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   PlusCircle,
@@ -11,14 +11,18 @@ import {
   Trash2,
   ExternalLink,
   CheckCircle2,
+  AlertCircle,
   Clock,
   Radio,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AlertDialog } from "@/components/admin/AlertDialog";
 
 interface PostItem {
   id: string;
   title: string;
+  slug?: string;
   category: string;
   author: string;
   status: "PUBLISHED" | "DRAFT";
@@ -31,6 +35,7 @@ const INITIAL_POSTS: PostItem[] = [
   {
     id: "1",
     title: "A nova era do minimalismo botânico: o ingrediente que está revolucionando o skincare de luxo.",
+    slug: "minimalismo-botanico-skincare-luxo",
     category: "Beauty",
     author: "Helena Castro",
     status: "PUBLISHED",
@@ -41,6 +46,7 @@ const INITIAL_POSTS: PostItem[] = [
   {
     id: "2",
     title: "Fusões milionárias: gigantes de cosméticos aceleram aquisições no Brasil.",
+    slug: "fusoes-gigantes-cosmeticos-brasil",
     category: "Business",
     author: "Lucas Ferreira",
     status: "PUBLISHED",
@@ -51,6 +57,7 @@ const INITIAL_POSTS: PostItem[] = [
   {
     id: "3",
     title: "Testamos o protetor solar com efeito primer que virou febre no TikTok.",
+    slug: "tratamentos-esteticos-nao-invasivos-sp",
     category: "Reviews",
     author: "Mariana Costa",
     status: "DRAFT",
@@ -64,6 +71,72 @@ export default function PostsAdminListPage() {
   const [posts, setPosts] = useState<PostItem[]>(INITIAL_POSTS);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Estados do Modal de Exclusão e Toast
+  const [deleteTarget, setDeleteTarget] = useState<PostItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Carrega lista em tempo real da API / Prisma
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch("/api/posts");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.posts && data.posts.length > 0) {
+            setPosts(data.posts);
+          }
+        }
+      } catch (err) {
+        console.warn("Aviso ao carregar posts da API:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadPosts();
+  }, []);
+
+  // Handler de Exclusão Definitiva via DELETE /api/posts/[id]
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+
+    try {
+      const res = await fetch(`/api/posts/${deleteTarget.id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setPosts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+        setToast({
+          type: "success",
+          text: `A postagem "${deleteTarget.title}" foi excluída com sucesso.`,
+        });
+      } else {
+        setToast({
+          type: "error",
+          text:
+            data.error ||
+            "Não foi possível excluir a postagem. Verifique se você possui permissão de Administrador (ADMIN).",
+        });
+      }
+    } catch (err) {
+      console.error("[DELETE_POST_FRONTEND_ERROR]", err);
+      setToast({
+        type: "error",
+        text: "Erro de conexão ao tentar excluir a postagem. Tente novamente.",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteTarget(null);
+      setTimeout(() => setToast(null), 5000);
+    }
+  };
 
   const filteredPosts = posts.filter((p) => {
     const matchStatus = filterStatus === "ALL" || p.status === filterStatus;
@@ -108,6 +181,34 @@ export default function PostsAdminListPage() {
         </div>
       </div>
 
+      {/* Toast de Notificação (Sucesso ou Erro 403) */}
+      {toast && (
+        <div
+          className={cn(
+            "p-4 rounded-2xl border flex items-center justify-between gap-3 text-sm animate-fade-in shadow-xl",
+            toast.type === "success"
+              ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-300"
+              : "bg-red-950/90 border-red-500/60 text-red-200"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            {toast.type === "success" ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+            )}
+            <span className="font-medium">{toast.text}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-neutral-400 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Filtros e Busca */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
@@ -145,7 +246,7 @@ export default function PostsAdminListPage() {
         </div>
       </div>
 
-      {/* Lista Responsiva de Posts (Cards Mobile / Tabela Desktop) */}
+      {/* Lista Responsiva de Posts */}
       <div className="bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden divide-y divide-neutral-800">
         {filteredPosts.length === 0 ? (
           <div className="p-12 text-center text-neutral-500 text-sm">
@@ -187,7 +288,7 @@ export default function PostsAdminListPage() {
                 </div>
               </div>
 
-              {/* Estatísticas e Ações Rápidas */}
+              {/* Estatísticas e Ações Rápidas (Editar, Ver e Excluir) */}
               <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-neutral-800/60">
                 <div className="text-xs text-neutral-400 sm:text-right pr-2">
                   <span className="text-neutral-500">Visualizações: </span>
@@ -204,19 +305,43 @@ export default function PostsAdminListPage() {
                   </Link>
 
                   <Link
-                    href="/"
+                    href={post.slug ? `/post/${post.slug}` : "/"}
                     target="_blank"
                     className="p-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors"
                     title="Ver no Portal"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
+
+                  {/* Botão de Excluir Postagem (Apenas ADMIN) */}
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(post)}
+                    className="p-2 rounded-xl bg-neutral-800 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 transition-colors"
+                    title="Excluir Postagem"
+                    aria-label="Excluir Postagem"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Modal de Confirmação de Exclusão (AlertDialog shadcn style) */}
+      <AlertDialog
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Postagem"
+        description="Tem a certeza de que deseja excluir esta postagem? Esta ação não pode ser desfeita."
+        itemBadge={deleteTarget?.title}
+        confirmLabel="Sim, excluir"
+        cancelLabel="Cancelar"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

@@ -138,16 +138,43 @@ export function escapeSearchQuery(query: string): string {
  * Schema Zod para validação rigorosa de entrada de novos Posts (Prevenção de Mass Assignment)
  */
 export const PostSubmissionSchema = z.object({
-  title: z.string().min(5, "O título deve ter no mínimo 5 caracteres").max(200),
-  subtitle: z.string().max(350).optional(),
-  category: z.string().min(2).max(50),
-  author: z.string().min(2).max(100),
-  imageWeb: z.string().url("A imagem web deve ser uma URL válida"),
-  imageMobile: z.string().url("A imagem mobile deve ser uma URL válida").optional(),
-  imageSourceText: z.string().max(120).optional(),
-  imageSourceUrl: z.string().url().optional().or(z.literal("")),
-  content: z.string().min(20, "O artigo deve ter no mínimo 20 caracteres"),
-  tags: z.array(z.string().min(1).max(40)).max(15),
+  title: z
+    .string()
+    .min(5, "O título deve ter no mínimo 5 caracteres")
+    .max(200, "O título deve ter no máximo 200 caracteres"),
+  subtitle: z.string().max(350, "O subtítulo deve ter no máximo 350 caracteres").optional().or(z.literal("")).or(z.null()),
+  category: z
+    .string()
+    .min(2, "A categoria deve ter no mínimo 2 caracteres")
+    .max(50),
+  author: z
+    .string()
+    .min(2, "O nome do autor deve ter no mínimo 2 caracteres")
+    .max(100)
+    .optional()
+    .or(z.literal("")),
+  date: z.string().optional().or(z.literal("")),
+  imageWeb: z
+    .string()
+    .min(1, "A imagem de capa (Desktop) é obrigatória")
+    .url("A imagem de capa (Desktop) deve ser uma URL válida (ex: https://...)"),
+  imageMobile: z
+    .string()
+    .url("A imagem mobile deve ser uma URL válida")
+    .optional()
+    .or(z.literal(""))
+    .or(z.null()),
+  imageSourceText: z.string().max(120, "O crédito da imagem deve ter no máximo 120 caracteres").optional().or(z.literal("")).or(z.null()),
+  imageSourceUrl: z
+    .string()
+    .url("O link da fonte da imagem deve ser uma URL válida")
+    .optional()
+    .or(z.literal(""))
+    .or(z.null()),
+  content: z
+    .string()
+    .min(10, "O conteúdo da matéria deve ter no mínimo 10 caracteres"),
+  tags: z.array(z.string()).default([]),
   status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]).default("DRAFT"),
 });
 
