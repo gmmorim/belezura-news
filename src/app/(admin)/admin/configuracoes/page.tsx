@@ -8,9 +8,6 @@ import {
   Share2,
   Instagram,
   Linkedin,
-  Twitter,
-  AtSign,
-  Video,
   Youtube,
   Sparkles,
   Save,
@@ -19,6 +16,7 @@ import {
   AlertCircle,
   Eye,
 } from "lucide-react";
+import { TikTokIcon, ThreadsIcon, XIcon } from "@/components/icons/SocialIcons";
 
 export default function AdminConfiguracoesPage() {
   const [loading, setLoading] = useState(true);
@@ -350,7 +348,7 @@ export default function AdminConfiguracoesPage() {
               {/* Twitter / X */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                  <Twitter className="w-4 h-4 text-neutral-300" />
+                  <XIcon className="w-4 h-4 text-white" />
                   <span>X (Antigo Twitter)</span>
                 </label>
                 <input
@@ -366,7 +364,7 @@ export default function AdminConfiguracoesPage() {
               {/* Threads */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                  <AtSign className="w-4 h-4 text-white" />
+                  <ThreadsIcon className="w-4 h-4 text-white" />
                   <span>Threads</span>
                 </label>
                 <input
@@ -382,7 +380,7 @@ export default function AdminConfiguracoesPage() {
               {/* TikTok */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                  <Video className="w-4 h-4 text-teal-400" />
+                  <TikTokIcon className="w-4 h-4 text-white" />
                   <span>TikTok</span>
                 </label>
                 <input
@@ -429,18 +427,18 @@ export default function AdminConfiguracoesPage() {
                   </span>
                 )}
                 {form.social_twitter_url && (
-                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Twitter configurado">
-                    <Twitter className="w-4 h-4 text-neutral-300" />
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Twitter / X configurado">
+                    <XIcon className="w-4 h-4 text-neutral-200" />
                   </span>
                 )}
                 {form.social_threads_url && (
                   <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Threads configurado">
-                    <AtSign className="w-4 h-4 text-white" />
+                    <ThreadsIcon className="w-4 h-4 text-white" />
                   </span>
                 )}
                 {form.social_tiktok_url && (
                   <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="TikTok configurado">
-                    <Video className="w-4 h-4 text-teal-400" />
+                    <TikTokIcon className="w-4 h-4 text-white" />
                   </span>
                 )}
                 {form.social_youtube_url && (

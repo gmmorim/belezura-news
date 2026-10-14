@@ -9,11 +9,9 @@ import {
   Megaphone,
   Instagram,
   Linkedin,
-  Twitter,
-  AtSign,
-  Video,
   Youtube,
 } from "lucide-react";
+import { TikTokIcon, ThreadsIcon, XIcon } from "@/components/icons/SocialIcons";
 import { CATEGORIES } from "./CategoryNav";
 
 export function Footer() {
@@ -174,9 +172,9 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
-                  aria-label="Twitter Belezura News"
+                  aria-label="Twitter / X Belezura News"
                 >
-                  <Twitter className="w-4 h-4" />
+                  <XIcon className="w-4 h-4" />
                 </a>
               )}
               {socialLinks.threads && (
@@ -187,7 +185,7 @@ export function Footer() {
                   className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="Threads Belezura News"
                 >
-                  <AtSign className="w-4 h-4" />
+                  <ThreadsIcon className="w-4 h-4" />
                 </a>
               )}
               {socialLinks.tiktok && (
@@ -198,7 +196,7 @@ export function Footer() {
                   className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="TikTok Belezura News"
                 >
-                  <Video className="w-4 h-4" />
+                  <TikTokIcon className="w-4 h-4" />
                 </a>
               )}
               {socialLinks.youtube && (
