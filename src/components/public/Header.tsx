@@ -157,7 +157,7 @@ export function Header() {
               <div className="p-5 flex items-center justify-between border-b border-neutral-100">
                 <div className="flex items-center gap-2.5">
                   <img
-                    src="/images/logo-belezura-header.png"
+                    src="/images/belezura_logo_menu.webp"
                     alt="Belezura"
                     width={728}
                     height={150}
