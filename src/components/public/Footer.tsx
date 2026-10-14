@@ -1,13 +1,66 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Mail, ArrowRight, CheckCircle2, Megaphone, Instagram, Linkedin, Twitter } from "lucide-react";
+import {
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+  Megaphone,
+  Instagram,
+  Linkedin,
+  Twitter,
+  AtSign,
+  Video,
+  Youtube,
+} from "lucide-react";
 import { CATEGORIES } from "./CategoryNav";
 
 export function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: "https://instagram.com/belezuranews",
+    linkedin: "https://linkedin.com/company/belezuranews",
+    twitter: "https://x.com/belezuranews",
+    threads: "https://threads.net/@belezuranews",
+    tiktok: "https://tiktok.com/@belezuranews",
+    youtube: "",
+  });
+  const [contactEmail, setContactEmail] = useState("contato@belezuranews.com.br");
+  const [commercialUrl, setCommercialUrl] = useState("mailto:comercial@belezuranews.com.br");
+
+  // Carregar configurações dinâmicas gerenciadas no Painel Admin
+  useEffect(() => {
+    async function loadFooterConfigs() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.configs) {
+            setSocialLinks({
+              instagram: data.configs.social_instagram_url ?? "https://instagram.com/belezuranews",
+              linkedin: data.configs.social_linkedin_url ?? "https://linkedin.com/company/belezuranews",
+              twitter: data.configs.social_twitter_url ?? "https://x.com/belezuranews",
+              threads: data.configs.social_threads_url ?? "https://threads.net/@belezuranews",
+              tiktok: data.configs.social_tiktok_url ?? "",
+              youtube: data.configs.social_youtube_url ?? "",
+            });
+            if (data.configs.footer_contact_email) {
+              setContactEmail(data.configs.footer_contact_email);
+            }
+            if (data.configs.footer_commercial_url) {
+              setCommercialUrl(data.configs.footer_commercial_url);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("Aviso ao carregar configurações do rodapé:", err);
+      }
+    }
+    loadFooterConfigs();
+  }, []);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,34 +145,73 @@ export function Footer() {
               O portal contemporâneo que conecta mercado de beleza, moda, tendências de negócios, lifestyle e reviews sinceros.
             </p>
 
-            <div className="flex items-center gap-3 pt-2">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
-                aria-label="Instagram Belezura News"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
-                aria-label="LinkedIn Belezura News"
-              >
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noreferrer"
-                className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
-                aria-label="Twitter Belezura News"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              {socialLinks.instagram && (
+                <a
+                  href={socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="Instagram Belezura News"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.linkedin && (
+                <a
+                  href={socialLinks.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="LinkedIn Belezura News"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.twitter && (
+                <a
+                  href={socialLinks.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="Twitter Belezura News"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.threads && (
+                <a
+                  href={socialLinks.threads}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="Threads Belezura News"
+                >
+                  <AtSign className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.tiktok && (
+                <a
+                  href={socialLinks.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="TikTok Belezura News"
+                >
+                  <Video className="w-4 h-4" />
+                </a>
+              )}
+              {socialLinks.youtube && (
+                <a
+                  href={socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  aria-label="YouTube Belezura News"
+                >
+                  <Youtube className="w-4 h-4" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -158,7 +250,7 @@ export function Footer() {
             {/* BOTÃO OBRIGATÓRIO DE CTA PARA O COMERCIAL */}
             <div className="pt-2">
               <a
-                href="mailto:comercial@belezuranews.com.br"
+                href={commercialUrl}
                 className="font-alleron w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-md shadow-orange-500/20"
               >
                 <span>Quer anunciar com a gente?</span>
@@ -170,10 +262,10 @@ export function Footer() {
             <div className="pt-2 text-xs text-neutral-400 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
               <span>Contato editorial e geral:</span>
               <a
-                href="mailto:contato@belezuranews.com.br"
+                href={contactEmail.includes("@") && !contactEmail.startsWith("mailto:") ? `mailto:${contactEmail}` : contactEmail}
                 className="text-neutral-200 hover:text-[#ff6305] font-semibold underline underline-offset-4 decoration-neutral-700 hover:decoration-[#ff6305] transition-colors"
               >
-                contato@belezuranews.com.br
+                {contactEmail}
               </a>
             </div>
           </div>

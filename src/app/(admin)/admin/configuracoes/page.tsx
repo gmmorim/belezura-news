@@ -5,7 +5,13 @@ import {
   Settings,
   Mail,
   Briefcase,
-  ShieldCheck,
+  Share2,
+  Instagram,
+  Linkedin,
+  Twitter,
+  AtSign,
+  Video,
+  Youtube,
   Sparkles,
   Save,
   CheckCircle2,
@@ -26,17 +32,12 @@ export default function AdminConfiguracoesPage() {
     newsletter_headline: "Receba o Belezura Drops toda manhã",
     newsletter_subheadline:
       "As principais tendências de beleza, moda e negócios no seu e-mail, de forma leve e descomplicada.",
-    privacy_policy_text: `Política de Privacidade - Belezura News
-
-Última atualização: Outubro de 2026.
-
-1. Coleta de Informações: Coletamos apenas dados estritamente necessários para o funcionamento da plataforma e entrega de nossa newsletter, como endereço de e-mail e métricas de navegação anônimas.
-
-2. Uso dos Dados: Seu e-mail é utilizado exclusivamente para o envio do compilado editorial Belezura Drops e avisos importantes sobre o portal. Não comercializamos seus dados em hipótese alguma com terceiros.
-
-3. Cookies e Rastreamento: Utilizamos cookies técnicos para garantir a velocidade e usabilidade do site, além de mensurar audiência de forma agregada e em conformidade com a LGPD.
-
-4. Seus Direitos (LGPD): A qualquer momento você pode solicitar o descadastro definitivo de nossa base de e-mails através do link presente no rodapé de cada edição ou entrando em contato com nosso Encarregado de Dados.`,
+    social_instagram_url: "https://instagram.com/belezuranews",
+    social_linkedin_url: "https://linkedin.com/company/belezuranews",
+    social_twitter_url: "https://x.com/belezuranews",
+    social_threads_url: "https://threads.net/@belezuranews",
+    social_tiktok_url: "https://tiktok.com/@belezuranews",
+    social_youtube_url: "",
   });
 
   // Carregar dados salvos da API
@@ -104,17 +105,12 @@ export default function AdminConfiguracoesPage() {
         newsletter_headline: "Receba o Belezura Drops toda manhã",
         newsletter_subheadline:
           "As principais tendências de beleza, moda e negócios no seu e-mail, de forma leve e descomplicada.",
-        privacy_policy_text: `Política de Privacidade - Belezura News
-
-Última atualização: Outubro de 2026.
-
-1. Coleta de Informações: Coletamos apenas dados estritamente necessários para o funcionamento da plataforma e entrega de nossa newsletter, como endereço de e-mail e métricas de navegação anônimas.
-
-2. Uso dos Dados: Seu e-mail é utilizado exclusivamente para o envio do compilado editorial Belezura Drops e avisos importantes sobre o portal. Não comercializamos seus dados em hipótese alguma com terceiros.
-
-3. Cookies e Rastreamento: Utilizamos cookies técnicos para garantir a velocidade e usabilidade do site, além de mensurar audiência de forma agregada e em conformidade com a LGPD.
-
-4. Seus Direitos (LGPD): A qualquer momento você pode solicitar o descadastro definitivo de nossa base de e-mails através do link presente no rodapé de cada edição ou entrando em contato com nosso Encarregado de Dados.`,
+        social_instagram_url: "https://instagram.com/belezuranews",
+        social_linkedin_url: "https://linkedin.com/company/belezuranews",
+        social_twitter_url: "https://x.com/belezuranews",
+        social_threads_url: "https://threads.net/@belezuranews",
+        social_tiktok_url: "https://tiktok.com/@belezuranews",
+        social_youtube_url: "",
       });
     }
   };
@@ -134,7 +130,7 @@ export default function AdminConfiguracoesPage() {
             <span>Configurações Vitais</span>
           </h1>
           <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-            Gerencie textos do rodapé, contatos comerciais, chamadas da newsletter e política de privacidade.
+            Gerencie textos do rodapé, contatos comerciais, chamadas da newsletter e links das redes sociais oficiais.
           </p>
         </div>
 
@@ -304,35 +300,158 @@ export default function AdminConfiguracoesPage() {
             </div>
           </div>
 
-          {/* SEÇÃO 3: POLÍTICA DE PRIVACIDADE */}
+          {/* SEÇÃO 3: REDES SOCIAIS OFICIAIS (RODAPÉ) */}
           <div className="p-6 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-5">
             <div className="flex items-center gap-2.5 pb-4 border-b border-neutral-800">
-              <ShieldCheck className="w-5 h-5 text-[#ff6305]" />
+              <Share2 className="w-5 h-5 text-[#ff6305]" />
               <div>
                 <h2 className="font-recoleta text-lg font-bold text-white">
-                  Texto da Política de Privacidade (LGPD)
+                  Redes Sociais Oficiais (Rodapé)
                 </h2>
                 <p className="text-xs text-neutral-400">
-                  Texto legal que alimenta a página pública /politica-de-privacidade e o banner de cookies.
+                  Configure os links dos perfis oficiais exibidos nos botões de redes sociais do rodapé.
                 </p>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5">
-                Conteúdo Oficial da Política
-              </label>
-              <textarea
-                name="privacy_policy_text"
-                rows={12}
-                value={form.privacy_policy_text}
-                onChange={handleChange}
-                placeholder="Insira os termos da política de privacidade..."
-                className="w-full p-4 bg-neutral-950 border border-neutral-800 rounded-xl text-sm font-mono text-neutral-200 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305] leading-relaxed"
-              />
-              <span className="text-[11px] text-neutral-500 mt-1 block">
-                Suporta parágrafos simples e quebras de linha.
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Instagram */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <Instagram className="w-4 h-4 text-pink-500" />
+                  <span>Instagram</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_instagram_url"
+                  value={form.social_instagram_url}
+                  onChange={handleChange}
+                  placeholder="https://instagram.com/belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+
+              {/* LinkedIn */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <Linkedin className="w-4 h-4 text-blue-500" />
+                  <span>LinkedIn</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_linkedin_url"
+                  value={form.social_linkedin_url}
+                  onChange={handleChange}
+                  placeholder="https://linkedin.com/company/belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+
+              {/* Twitter / X */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <Twitter className="w-4 h-4 text-neutral-300" />
+                  <span>X (Antigo Twitter)</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_twitter_url"
+                  value={form.social_twitter_url}
+                  onChange={handleChange}
+                  placeholder="https://x.com/belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+
+              {/* Threads */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <AtSign className="w-4 h-4 text-white" />
+                  <span>Threads</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_threads_url"
+                  value={form.social_threads_url}
+                  onChange={handleChange}
+                  placeholder="https://threads.net/@belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+
+              {/* TikTok */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <Video className="w-4 h-4 text-teal-400" />
+                  <span>TikTok</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_tiktok_url"
+                  value={form.social_tiktok_url}
+                  onChange={handleChange}
+                  placeholder="https://tiktok.com/@belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+
+              {/* YouTube */}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                  <Youtube className="w-4 h-4 text-red-500" />
+                  <span>YouTube</span>
+                </label>
+                <input
+                  type="url"
+                  name="social_youtube_url"
+                  value={form.social_youtube_url}
+                  onChange={handleChange}
+                  placeholder="https://youtube.com/@belezuranews"
+                  className="w-full px-4 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                />
+              </div>
+            </div>
+
+            {/* Prévia dos Botões do Rodapé */}
+            <div className="pt-2">
+              <span className="text-xs text-neutral-400 font-medium flex items-center gap-1.5 mb-2">
+                <Eye className="w-3.5 h-3.5 text-[#ff6305]" /> Prévia dos ícones ativos no rodapé:
               </span>
+              <div className="p-4 rounded-xl bg-[#111111] border border-neutral-800 flex flex-wrap items-center gap-3">
+                {form.social_instagram_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Instagram configurado">
+                    <Instagram className="w-4 h-4 text-pink-400" />
+                  </span>
+                )}
+                {form.social_linkedin_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="LinkedIn configurado">
+                    <Linkedin className="w-4 h-4 text-blue-400" />
+                  </span>
+                )}
+                {form.social_twitter_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Twitter configurado">
+                    <Twitter className="w-4 h-4 text-neutral-300" />
+                  </span>
+                )}
+                {form.social_threads_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="Threads configurado">
+                    <AtSign className="w-4 h-4 text-white" />
+                  </span>
+                )}
+                {form.social_tiktok_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="TikTok configurado">
+                    <Video className="w-4 h-4 text-teal-400" />
+                  </span>
+                )}
+                {form.social_youtube_url && (
+                  <span className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-white" title="YouTube configurado">
+                    <Youtube className="w-4 h-4 text-red-500" />
+                  </span>
+                )}
+                {!form.social_instagram_url && !form.social_linkedin_url && !form.social_twitter_url && !form.social_threads_url && !form.social_tiktok_url && !form.social_youtube_url && (
+                  <span className="text-xs text-neutral-500">Nenhuma rede social configurada no momento.</span>
+                )}
+              </div>
             </div>
           </div>
 
