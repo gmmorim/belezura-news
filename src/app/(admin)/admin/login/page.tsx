@@ -4,7 +4,7 @@ import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { Lock, Mail, ArrowRight, Eye, EyeOff, ShieldCheck, AlertCircle, ArrowLeft } from "lucide-react";
+import { Lock, Mail, ArrowRight, Eye, EyeOff, AlertCircle, ArrowLeft } from "lucide-react";
 
 export default function AdminLoginPage() {
   return (
@@ -124,7 +124,7 @@ function LoginForm() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@belezuranews.com.br"
+                  placeholder="seu.email@belezuranews.com.br"
                   required
                   autoFocus
                   className="w-full pl-10 pr-4 py-3 bg-neutral-950/80 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-[#ff6305] focus:border-transparent transition-all"
@@ -170,20 +170,6 @@ function LoginForm() {
               </button>
             </div>
           </form>
-
-          {/* Dica de Acesso Rápido / Seed Inicial */}
-          <div className="mt-6 pt-5 border-t border-neutral-800/80 text-xs text-neutral-400 space-y-1">
-            <div className="flex items-center gap-1.5 text-neutral-300 font-semibold mb-1">
-              <ShieldCheck className="w-4 h-4 text-[#ff6305]" />
-              <span>Acesso Inicial da Diretoria:</span>
-            </div>
-            <p className="text-[11px] text-neutral-400">
-              Usuário: <code className="text-orange-300 bg-neutral-950 px-1.5 py-0.5 rounded border border-neutral-800">admin@belezuranews.com.br</code>
-            </p>
-            <p className="text-[11px] text-neutral-400">
-              Senha padrão: <code className="text-orange-300 bg-neutral-950 px-1.5 py-0.5 rounded border border-neutral-800">Admin@Belezura2026</code>
-            </p>
-          </div>
         </div>
 
         {/* Rodapé do Login */}
