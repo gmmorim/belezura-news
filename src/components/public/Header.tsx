@@ -14,6 +14,7 @@ import {
 import { AnimatedHeaderLogo } from "./AnimatedHeaderLogo";
 import { CATEGORIES } from "./CategoryNav";
 import { NewsletterModal } from "./NewsletterModal";
+import { SearchBar } from "./SearchBar";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -118,24 +119,19 @@ export function Header() {
             </div>
           </div>
 
-          {/* Barra de Busca Expansível */}
+          {/* Barra de Busca Expansível com Live Search */}
           <AnimatePresence>
             {searchOpen && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden mt-4 pt-4 border-t border-neutral-200"
+                className="mt-4 pt-4 border-t border-neutral-200 relative z-30"
               >
-                <div className="relative max-w-xl mx-auto">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
-                  <input
-                    type="search"
-                    placeholder="Busque por pautas, marcas, tendências ou reviews..."
-                    className="w-full pl-11 pr-4 py-2.5 bg-white border border-neutral-200 rounded-full text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#ff6305] focus:border-transparent transition-all shadow-sm"
-                    autoFocus
-                  />
-                </div>
+                <SearchBar
+                  autoFocus
+                  onSelectResult={() => setSearchOpen(false)}
+                />
               </motion.div>
             )}
           </AnimatePresence>
