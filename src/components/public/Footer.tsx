@@ -131,10 +131,14 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-neutral-800">
           {/* Coluna 1: Marca & Manifesto */}
           <div className="lg:col-span-4 space-y-4">
-            <Link href="/" className="inline-block group">
-              <span className="font-recoleta text-4xl sm:text-5xl font-normal text-white tracking-tight leading-[0.9] block group-hover:text-[#ff6305] transition-colors">
-                Bele<br />zura
-              </span>
+            <Link href="/" className="inline-block group focus:outline-none" aria-label="Página inicial Belezura">
+              <img
+                src="/images/logo-footer.png"
+                alt="Belezura"
+                width={160}
+                height={113}
+                className="h-16 sm:h-20 w-auto object-contain transition-all duration-200 group-hover:brightness-110 group-hover:opacity-90"
+              />
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
               O portal que conecta beleza, moda, negócios e lifestyle, com curadoria de tendências, novidades do mercado e reviews sinceros.
