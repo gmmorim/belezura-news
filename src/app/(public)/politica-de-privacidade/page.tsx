@@ -162,25 +162,45 @@ export default function PoliticaPrivacidadePage() {
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-neutral-900 text-white space-y-3">
+            <div className="p-6 sm:p-7 rounded-2xl bg-neutral-900 text-white space-y-5">
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-[#ff6305]" />
                 <h3 className="font-alleron text-xs font-bold uppercase tracking-wider text-white">
-                  Como Solicitar a Exclusão dos Seus Dados
+                  Como Cancelar a Subscrição ou Excluir os Seus Dados
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
-                Para solicitar a remoção ou cópia de seus dados, envie uma mensagem com o assunto <strong>&quot;Exclusão de Dados - LGPD&quot;</strong> para o e-mail:
-              </p>
-              <a
-                href="mailto:contato@belezuranews.com.br?subject=Exclus%C3%A3o%20de%20Dados%20-%20LGPD"
-                className="inline-block px-4 py-2.5 rounded-xl bg-[#ff6305] text-white font-alleron text-xs font-bold uppercase tracking-wider hover:bg-orange-600 transition-colors"
-              >
-                contato@belezuranews.com.br
-              </a>
-              <p className="text-[11px] text-neutral-400">
-                Nosso compromisso é responder e concluir sua solicitação em até 48 horas úteis.
-              </p>
+
+              {/* Cancelamento Automático da Newsletter */}
+              <div className="p-4 rounded-xl bg-neutral-800/80 border border-neutral-700/60 space-y-1.5">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#ff6305] font-alleron">
+                  Cancelamento Automático da Newsletter
+                </p>
+                <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
+                  Para deixar de receber a nossa curadoria e cancelar a sua inscrição na Newsletter, basta clicar no link <strong>&quot;Descadastrar&quot;</strong> ou <strong>&quot;Unsubscribe&quot;</strong> disponível no rodapé de todos os e-mails que enviamos. O cancelamento é processado de forma automática e imediata.
+                </p>
+              </div>
+
+              {/* Exclusão Definitiva de Registros (LGPD) */}
+              <div className="p-4 rounded-xl bg-neutral-800/80 border border-neutral-700/60 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-[#ff6305] font-alleron">
+                  Exclusão Definitiva de Dados (LGPD)
+                </p>
+                <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
+                  Caso deseje a exclusão total e definitiva de qualquer registro associado ao seu e-mail na nossa base de dados (em conformidade com a LGPD), envie uma mensagem com o assunto <strong>&quot;Exclusão Definitiva de Dados&quot;</strong> para o nosso canal de privacidade:
+                </p>
+                <div className="pt-1">
+                  <a
+                    href="mailto:contato@belezuranews.com.br?subject=Exclus%C3%A3o%20Definitiva%20de%20Dados"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#ff6305] text-white font-alleron text-xs font-bold uppercase tracking-wider hover:bg-orange-600 transition-colors"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>contato@belezuranews.com.br</span>
+                  </a>
+                </div>
+                <p className="text-[11px] text-neutral-400">
+                  O nosso compromisso é concluir esta solicitação em até 48 horas úteis.
+                </p>
+              </div>
             </div>
           </section>
 
