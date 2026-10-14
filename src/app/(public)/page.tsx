@@ -139,14 +139,14 @@ export default async function HomePage() {
       {/* SEÇÃO HERO EDITORIAL: 3 MATÉRIAS (8 COLS DESTAQUE + 4 COLS STACK)   */}
       {/* ------------------------------------------------------------------ */}
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch w-full">
           
           {/* Lado Esquerdo: Matéria de Capa Principal (8 Colunas no Desktop) */}
           <article className="w-full lg:col-span-8 group cursor-pointer flex flex-col items-start text-left">
-            {/* 1. Imagem no Topo limpa (object-cover, sem overlay, sem gradiente, rounded-none) */}
+            {/* 1. Imagem no Topo limpa com aspect-video travado */}
             <Link
               href={`/post/${heroPost.slug}`}
-              className="block relative w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
+              className="block relative w-full aspect-video overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
             >
               <img
                 src={heroPost.imageWeb}
@@ -208,17 +208,17 @@ export default async function HomePage() {
           </article>
 
           {/* Lado Direito: 2 Matérias Menores Empilhadas Verticalmente (4 Colunas) */}
-          <div className="w-full lg:col-span-4 flex flex-col gap-8 justify-between">
+          <div className="w-full lg:col-span-4 flex flex-col justify-between h-full gap-8 lg:gap-0">
             {sideHeroPosts.length > 0 ? (
               sideHeroPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="group flex flex-col items-start text-left flex-1"
+                  className="group flex flex-col items-start text-left"
                 >
-                  {/* 1. Imagem no Topo limpa */}
+                  {/* 1. Imagem no Topo limpa travada em aspect-video */}
                   <Link
                     href={`/post/${post.slug}`}
-                    className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
+                    className="block relative aspect-video w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
                   >
                     <img
                       src={post.imageWeb}
@@ -226,12 +226,6 @@ export default async function HomePage() {
                       className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                   </Link>
-
-                  {/* Crédito de fonte */}
-                  <div className="mt-1 text-[10px] text-neutral-400 flex items-center gap-1">
-                    <span>Fonte:</span>
-                    <span className="text-neutral-500 truncate">{post.imageSourceText || "Divulgação"}</span>
-                  </div>
 
                   {/* 2. Categoria em Destaque */}
                   <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-2.5">
@@ -244,22 +238,6 @@ export default async function HomePage() {
                       {post.title}
                     </Link>
                   </h2>
-
-                  {/* Subtítulo */}
-                  {post.subtitle && (
-                    <p className="mt-1.5 text-xs text-neutral-500 line-clamp-2 leading-relaxed font-light">
-                      {post.subtitle}
-                    </p>
-                  )}
-
-                  {/* Metadados */}
-                  <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400 w-full">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-[#ff6305]" />
-                      {getReadingTime(post.content)}
-                    </span>
-                    <span>{formatRelativeTime(post.createdAt)}</span>
-                  </div>
                 </article>
               ))
             ) : (
