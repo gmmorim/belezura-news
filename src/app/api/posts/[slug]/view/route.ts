@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, hashClientIp } from "@/lib/security";
-
-// Simulação de banco em memória para contagem de views instantânea em tempo real
-export const internalViewsStore: Record<string, number> = {
-  "minimalismo-botanico-skincare-luxo": 1420,
-  "fusoes-gigantes-cosmeticos-brasil": 890,
-  "rotina-matinal-fundadoras-startups": 640,
-};
-
-// Histórico temporal de views para agregações analíticas (últimos 7 e 30 dias)
-export const internalViewLogs: Array<{ slug: string; timestamp: number; category: string }> = [];
+import { internalViewsStore, internalViewLogs } from "@/lib/views-store";
 
 export async function POST(
   request: NextRequest,

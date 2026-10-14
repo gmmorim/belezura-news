@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { internalViewsStore } from "@/app/api/posts/[slug]/view/route";
+import { internalViewsStore } from "@/lib/views-store";
 
 export async function GET(request: NextRequest) {
   try {

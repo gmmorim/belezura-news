@@ -5,12 +5,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Cookie, X } from "lucide-react";
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
 const STORAGE_KEY = "belezura_cookie_consent_v1";
 
 export function CookieConsent() {

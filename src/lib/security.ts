@@ -165,15 +165,14 @@ interface RateLimitRecord {
 // Armazenamento em memória com limpeza periódica (TTL)
 const rateLimitCache = new Map<string, RateLimitRecord>();
 
-// Limpeza automática para evitar vazamento de memória (a cada 5 minutos)
 if (typeof setInterval !== "undefined") {
   setInterval(() => {
     const now = Date.now();
-    for (const [key, record] of rateLimitCache.entries()) {
+    rateLimitCache.forEach((record, key) => {
       if (now > record.resetAt) {
         rateLimitCache.delete(key);
       }
-    }
+    });
   }, 5 * 60 * 1000);
 }
 
