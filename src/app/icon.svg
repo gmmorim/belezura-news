@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <style>
+      @font-face {
+        font-family: 'Recoleta';
+        src: local('Recoleta'), local('Recoleta-Bold'), url('/fonts/Recoleta-Bold.woff2') format('woff2');
+        font-weight: 700;
+        font-style: normal;
+      }
+      .brand-letter {
+        font-family: 'Recoleta', 'Recoleta Bold', Georgia, serif;
+        font-weight: bold;
+        font-size: 320px;
+        fill: #000000;
+      }
+    </style>
+  </defs>
+  <!-- Fundo oficial laranja Belezura News com cantos arredondados suaves -->
+  <rect width="512" height="512" rx="108" fill="#ff6305" />
+
+  <!-- Elemento central B maiúsculo matemática e opticamente centralizado -->
+  <text
+    x="256"
+    y="256"
+    text-anchor="middle"
+    dominant-baseline="central"
+    class="brand-letter"
+    font-family="Recoleta, Georgia, serif"
+    font-weight="bold"
+    font-size="320"
+    fill="#000000"
+  >B</text>
+</svg>
