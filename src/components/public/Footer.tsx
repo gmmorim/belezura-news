@@ -127,10 +127,10 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Grade de Informações, Editorias e CTA Obrigatório */}
+        {/* Grade de Informações, Editorias, Bio do Editor e Contato */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-neutral-800">
           {/* Coluna 1: Marca & Manifesto */}
-          <div className="lg:col-span-4 space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             <Link href="/" className="inline-block group focus:outline-none" aria-label="Página inicial Belezura">
               <img
                 src="/images/logo-footer.png"
@@ -215,7 +215,7 @@ export function Footer() {
           </div>
 
           {/* Coluna 2: Editorias */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <p className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305] mb-4">
               Editorias
             </p>
@@ -261,8 +261,28 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Coluna 3: CONTATO E PARCERIAS */}
-          <div id="contato" className="lg:col-span-5 space-y-4 bg-neutral-900/50 p-6 rounded-none border border-neutral-800/80 scroll-mt-24">
+          {/* Coluna 3: Bio do Editor-Chefe */}
+          <div className="lg:col-span-3 space-y-3">
+            <p className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305] mb-4">
+              Editor-Chefe
+            </p>
+            <div className="relative w-32 sm:w-36 aspect-[3/4] overflow-hidden rounded-none border border-neutral-800 bg-neutral-900 shadow-sm">
+              <img
+                src="/images/tom-candido.webp"
+                alt="Tom Candido - Fundador e Editor-Chefe"
+                className="w-full h-full object-cover object-top"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/tom-candido.jpg";
+                }}
+              />
+            </div>
+            <p className="mt-4 text-xs sm:text-sm text-neutral-400 leading-relaxed font-light">
+              <strong className="text-[#ff6305] font-bold">Tom Candido</strong> é publicitário, fundador da Belezura Agência e editor-chefe do Belezura News. Com mais de sete anos de experiência no mercado de beleza, construiu sua trajetória profissional com foco em marketing de influência, relações públicas e assessoria de imprensa especializada em marcas do segmento beauty.
+            </p>
+          </div>
+
+          {/* Coluna 4: CONTATO E PARCERIAS */}
+          <div id="contato" className="lg:col-span-4 space-y-4 bg-neutral-900/50 p-6 rounded-none border border-neutral-800/80 scroll-mt-24">
             <div className="flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-[#ff6305]" />
               <p className="font-alleron text-xs font-bold uppercase tracking-widest text-white">
