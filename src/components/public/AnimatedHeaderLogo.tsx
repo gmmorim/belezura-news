@@ -37,12 +37,12 @@ export function AnimatedHeaderLogo() {
           width={2010}
           height={410}
           priority
-          className="h-6 md:h-8 lg:h-10 w-auto object-contain transition-opacity duration-200 group-hover:opacity-85 shrink-0"
+          className="h-[34px] sm:h-10 md:h-12 lg:h-14 w-auto object-contain transition-opacity duration-200 group-hover:opacity-85 shrink-0"
         />
 
-        {/* Palavra dinâmica em texto puro: text-black italic font-bold e proporção harmônica text-2xl md:text-3xl lg:text-4xl */}
+        {/* Palavra dinâmica em texto puro com proporção milimétrica */}
         <span
-          className={`font-alleron font-bold italic text-black text-2xl md:text-3xl lg:text-4xl leading-none whitespace-nowrap transition-opacity duration-200 ease-in-out ${
+          className={`font-alleron font-bold italic text-black text-xl md:text-2xl lg:text-3xl leading-none whitespace-nowrap transition-opacity duration-200 ease-in-out ${
             fade ? "opacity-100" : "opacity-0"
           }`}
         >
