@@ -47,7 +47,7 @@ export async function middleware(req: NextRequest) {
   // -------------------------------------------------------------
   const token = await getToken({
     req,
-    secret: process.env.NEXTAUTH_SECRET || "belezura-dev-secret-key-change-in-prod-min-32-chars",
+    secret: process.env.NEXTAUTH_SECRET || "e6d84f87a31b29ce4590c76db3a8f1e58291f04dc2b8a71936c54e819b2a74cd",
   });
 
   // Se o token for inexistente ou inválido -> Bloqueio imediato (401 ou Redirecionamento)

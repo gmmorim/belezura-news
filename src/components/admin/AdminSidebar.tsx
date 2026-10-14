@@ -49,6 +49,11 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const pathname = usePathname();
 
+  // Em tela de login, não exibe sidebar nem header administrativo
+  if (pathname === "/admin/login") {
+    return <div className="min-h-screen bg-[#0d0d0d]">{children}</div>;
+  }
+
   // Simulação de usuário autenticado (Role: ADMIN)
   const currentUser = {
     name: "Helena Castro",
