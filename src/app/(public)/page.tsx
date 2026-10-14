@@ -100,11 +100,10 @@ export default async function HomePage() {
     });
   }
 
-  // 3. Seção "BLZURA News": Últimas Pautas & Tendências (exclui o Hero se possível)
+  // 3. Seção "BLZURA News": Últimas Pautas & Tendências (6 matérias para grid 2x3 no desktop)
   const blzuraNewsPosts = await prisma.post.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { createdAt: "desc" },
-    skip: topPosts.length >= 3 ? 3 : 0,
     take: 6,
     include: {
       category: true,
@@ -359,25 +358,16 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       <section className="w-full bg-white py-14 sm:py-20 border-t border-neutral-200/80">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4 border-b border-neutral-200 pb-6 text-left">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-[#ff6305]" />
-                <span className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305]">
-                  BLZURA News
-                </span>
-              </div>
-              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-black tracking-tight break-words">
-                Últimas Pautas & Tendências
-              </h2>
+          <div className="mb-8 sm:mb-12 border-b border-neutral-200 pb-6 text-left">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-[#ff6305]" />
+              <span className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305]">
+                BLZURA News
+              </span>
             </div>
-            <Link
-              href="/beauty"
-              className="font-alleron inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:text-[#ff6305] transition-colors group self-start sm:self-auto"
-            >
-              <span>Ver feed completo</span>
-              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
+            <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-black tracking-tight break-words">
+              Últimas Pautas & Tendências
+            </h2>
           </div>
 
           {/* Cards Dinâmicos com Estilo Editorial Empilhado Verticalmente */}
@@ -451,6 +441,17 @@ export default async function HomePage() {
                 </div>
               </article>
             ))}
+          </div>
+
+          {/* Botão Grande e Centralizado: Ver Mais Matérias */}
+          <div className="mt-12 sm:mt-16 flex justify-center w-full">
+            <Link
+              href="/beauty"
+              className="font-alleron inline-flex items-center justify-center gap-2.5 px-10 sm:px-14 py-4 sm:py-4.5 bg-[#ff6305] text-white text-sm sm:text-base font-bold uppercase tracking-widest rounded-none hover:bg-orange-600 active:scale-[0.99] transition-all shadow-md shadow-orange-500/20"
+            >
+              <span>Ver mais matérias</span>
+              <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </Link>
           </div>
         </div>
       </section>

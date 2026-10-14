@@ -266,7 +266,7 @@ export function Footer() {
             <div className="flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-[#ff6305]" />
               <p className="font-alleron text-xs font-bold uppercase tracking-widest text-white">
-                Parcerias Comerciais & Mídia
+                Parcerias Comerciais & Pautas
               </p>
             </div>
 

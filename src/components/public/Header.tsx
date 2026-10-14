@@ -155,15 +155,15 @@ export function Header() {
             >
               {/* Topo do Drawer */}
               <div className="p-5 flex items-center justify-between border-b border-neutral-100">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
                   <img
                     src="/images/logo-belezura-header.png"
                     alt="Belezura"
                     width={728}
                     height={150}
-                    className="h-6 w-auto object-contain"
+                    className="h-7 sm:h-8 w-auto object-contain"
                   />
-                  <span className="font-alleron text-[#ff6305] text-lg font-bold italic">News</span>
+                  <span className="font-alleron text-[#ff6305] text-xl font-bold italic">News</span>
                 </div>
                 <button
                   type="button"
