@@ -157,10 +157,10 @@ export function Header() {
               <div className="p-5 flex items-center justify-between border-b border-neutral-100">
                 <div className="flex items-center gap-2.5">
                   <img
-                    src="/images/belezura_logo_menu.webp"
+                    src="/images/logo-belezura.svg"
                     alt="Belezura"
-                    width={728}
-                    height={150}
+                    width={2010}
+                    height={410}
                     className="h-7 sm:h-8 w-auto object-contain"
                   />
                   <span className="font-alleron text-[#ff6305] text-xl font-bold italic">News</span>
