@@ -183,7 +183,7 @@ export function Footer() {
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 gap-4">
           <p>© {new Date().getFullYear()} Belezura News. Todos os direitos reservados.</p>
           <div className="flex items-center gap-6">
-            <Link href="/termos" className="hover:text-neutral-300 transition-colors">
+            <Link href="/termos-de-uso" className="hover:text-neutral-300 transition-colors">
               Termos de Uso
             </Link>
             <Link href="/politica-de-privacidade" className="hover:text-neutral-300 transition-colors">
