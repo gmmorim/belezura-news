@@ -123,7 +123,7 @@ export default async function HomePage() {
           <div className="w-12 h-12 rounded-none bg-orange-50 text-[#ff6305] flex items-center justify-center mx-auto border border-[#ff6305]/30">
             <Sparkles className="w-6 h-6" />
           </div>
-          <h1 className="font-recoleta text-2xl sm:text-3xl font-normal text-neutral-900">
+          <h1 className="font-recoleta text-2xl sm:text-3xl font-normal text-black">
             Nenhuma publicação no momento
           </h1>
           <p className="text-sm text-neutral-500 leading-relaxed">
@@ -137,64 +137,27 @@ export default async function HomePage() {
   return (
     <div className="w-full overflow-hidden">
       {/* ------------------------------------------------------------------ */}
-      {/* SEÇÃO HERO EDITORIAL: 3 MATÉRIAS (8 COLUNAS + 4 COLUNAS STACKED)   */}
+      {/* SEÇÃO HERO EDITORIAL: 3 MATÉRIAS (8 COLS DESTAQUE + 4 COLS STACK)   */}
       {/* ------------------------------------------------------------------ */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-10 sm:pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-12 sm:pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start w-full">
           
           {/* Lado Esquerdo: Matéria de Capa Principal (8 Colunas no Desktop) */}
-          <div className="w-full lg:col-span-8 group cursor-pointer flex flex-col">
+          <article className="w-full lg:col-span-8 group cursor-pointer flex flex-col items-start text-left">
+            {/* 1. Imagem no Topo limpa (object-cover, sem overlay, sem gradiente, rounded-none) */}
             <Link
               href={`/post/${heroPost.slug}`}
-              className="block relative w-full rounded-none overflow-hidden bg-neutral-900 border border-neutral-200/80 shadow-sm min-h-[460px] sm:min-h-[520px] lg:min-h-[600px] flex-1 flex flex-col justify-end"
+              className="block relative w-full aspect-[16/10] sm:aspect-[16/9] overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
             >
-              {/* Imagem de Fundo com Zoom Suave */}
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
-                style={{
-                  backgroundImage: `url('${heroPost.imageWeb}')`,
-                }}
+              <img
+                src={heroPost.imageWeb}
+                alt={heroPost.title}
+                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
-              {/* Gradiente Editorial Escuro para Legibilidade */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
-
-              {/* Badges de Contexto com Cantos Vivos (rounded-none) */}
-              <div className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-2 z-10 flex-wrap">
-                <span className="font-alleron px-3 py-1 rounded-none text-xs font-bold uppercase tracking-widest bg-[#ff6305] text-white shadow-md">
-                  {heroPost.category?.name || "Editorial"}
-                </span>
-                <span className="font-alleron px-3 py-1 rounded-none text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
-                  Capa da Semana
-                </span>
-              </div>
-
-              {/* Informações da Matéria */}
-              <div className="relative z-10 p-5 sm:p-7 md:p-8 text-white w-full space-y-2 sm:space-y-3">
-                <div className="flex items-center gap-2.5 text-xs text-neutral-300 font-medium">
-                  <span>Por {heroPost.author?.name || "Redação Belezura"}</span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-[#ff6305]" />
-                    {getReadingTime(heroPost.content)}
-                  </span>
-                </div>
-
-                {/* Título Principal */}
-                <h1 className="font-recoleta text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal tracking-tight text-white leading-snug sm:leading-tight break-words group-hover:text-orange-200 transition-colors">
-                  {heroPost.title}
-                </h1>
-
-                {/* Subtítulo / Linha Fina */}
-                {heroPost.subtitle && (
-                  <p className="text-xs sm:text-sm md:text-base text-neutral-200 line-clamp-2 max-w-2xl font-light leading-relaxed break-words">
-                    {heroPost.subtitle}
-                  </p>
-                )}
-              </div>
             </Link>
 
             {/* Crédito obrigatório de fonte */}
-            <div className="mt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1.5 px-1">
+            <div className="mt-1.5 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
               <span className="font-semibold text-neutral-400">Fonte:</span>
               <a
                 href={heroPost.imageSourceUrl || "#"}
@@ -206,66 +169,97 @@ export default async function HomePage() {
                 <ArrowUpRight className="w-3 h-3" />
               </a>
             </div>
-          </div>
+
+            {/* 2. Categoria em Destaque (abaixo da imagem, uppercase, font-bold, text-[#ff6305]) */}
+            <div className="mt-4 flex items-center gap-2">
+              <span className="font-alleron text-xs sm:text-sm font-bold uppercase tracking-wider text-[#ff6305]">
+                {heroPost.category?.name || "Editorial"}
+              </span>
+              <span className="text-neutral-300">•</span>
+              <span className="font-alleron text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                Capa da Semana
+              </span>
+            </div>
+
+            {/* 3. Título / Manchete (texto preto, font-recoleta, text-2xl a text-5xl) */}
+            <h1 className="mt-2 font-recoleta text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal text-black group-hover:text-[#ff6305] transition-colors leading-[1.15] tracking-tight">
+              <Link href={`/post/${heroPost.slug}`}>
+                {heroPost.title}
+              </Link>
+            </h1>
+
+            {/* Subtítulo / Linha Fina */}
+            {heroPost.subtitle && (
+              <p className="mt-3 text-sm sm:text-base text-neutral-600 line-clamp-3 font-light leading-relaxed">
+                {heroPost.subtitle}
+              </p>
+            )}
+
+            {/* Metadados de Autor, Tempo de Leitura e Data */}
+            <div className="mt-4 pt-4 border-t border-neutral-100 flex items-center gap-3 text-xs text-neutral-400 font-medium w-full">
+              <span>Por {heroPost.author?.name || "Redação Belezura"}</span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-[#ff6305]" />
+                {getReadingTime(heroPost.content)}
+              </span>
+              <span>•</span>
+              <span>{formatRelativeTime(heroPost.createdAt)}</span>
+            </div>
+          </article>
 
           {/* Lado Direito: 2 Matérias Menores Empilhadas Verticalmente (4 Colunas) */}
-          <div className="w-full lg:col-span-4 flex flex-col gap-6 justify-between">
+          <div className="w-full lg:col-span-4 flex flex-col gap-8 justify-between">
             {sideHeroPosts.length > 0 ? (
               sideHeroPosts.map((post) => (
                 <article
                   key={post.id}
-                  className="group flex flex-col bg-white border border-neutral-200/90 rounded-none overflow-hidden hover:border-[#ff6305]/60 hover:shadow-md transition-all duration-300 flex-1"
+                  className="group flex flex-col items-start text-left flex-1"
                 >
+                  {/* 1. Imagem no Topo limpa */}
                   <Link
                     href={`/post/${post.slug}`}
-                    className="block relative aspect-[16/9] w-full overflow-hidden bg-neutral-100"
+                    className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/80 shadow-sm"
                   >
-                    <div
-                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-                      style={{ backgroundImage: `url('${post.imageWeb}')` }}
+                    <img
+                      src={post.imageWeb}
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute top-3 left-3">
-                      <span className="font-alleron px-2.5 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider bg-black/85 text-white backdrop-blur-sm">
-                        {post.category?.name || "Editorial"}
-                      </span>
-                    </div>
                   </Link>
 
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px] text-neutral-400 font-medium">
-                        <span className="flex items-center gap-1 text-neutral-500">
-                          <Clock className="w-3 h-3 text-[#ff6305]" />
-                          {getReadingTime(post.content)}
-                        </span>
-                        <span>{formatRelativeTime(post.createdAt)}</span>
-                      </div>
+                  {/* Crédito de fonte */}
+                  <div className="mt-1 text-[10px] text-neutral-400 flex items-center gap-1">
+                    <span>Fonte:</span>
+                    <span className="text-neutral-500 truncate">{post.imageSourceText || "Divulgação"}</span>
+                  </div>
 
-                      <h2 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
-                        <Link href={`/post/${post.slug}`}>
-                          {post.title}
-                        </Link>
-                      </h2>
+                  {/* 2. Categoria em Destaque */}
+                  <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-2.5">
+                    {post.category?.name || "Editorial"}
+                  </span>
 
-                      {post.subtitle && (
-                        <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed font-light">
-                          {post.subtitle}
-                        </p>
-                      )}
-                    </div>
+                  {/* 3. Título / Manchete */}
+                  <h2 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-black group-hover:text-[#ff6305] transition-colors leading-snug">
+                    <Link href={`/post/${post.slug}`}>
+                      {post.title}
+                    </Link>
+                  </h2>
 
-                    <div className="pt-3 mt-3 border-t border-neutral-100 flex items-center justify-between">
-                      <Link
-                        href={`/post/${post.slug}`}
-                        className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                      >
-                        <span>Ler matéria</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                      <span className="text-[10px] text-neutral-400">
-                        {post.author?.name || "Redação"}
-                      </span>
-                    </div>
+                  {/* Subtítulo */}
+                  {post.subtitle && (
+                    <p className="mt-1.5 text-xs text-neutral-500 line-clamp-2 leading-relaxed font-light">
+                      {post.subtitle}
+                    </p>
+                  )}
+
+                  {/* Metadados */}
+                  <div className="mt-3 pt-2.5 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400 w-full">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#ff6305]" />
+                      {getReadingTime(post.content)}
+                    </span>
+                    <span>{formatRelativeTime(post.createdAt)}</span>
                   </div>
                 </article>
               ))
@@ -279,12 +273,12 @@ export default async function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* SEÇÃO INÉDITA: BLZURA ENTREVISTAS (ALTO CONTRASTE EDITORIAL)       */}
+      {/* SEÇÃO BLZURA ENTREVISTAS (ALTO CONTRASTE EDITORIAL)                 */}
       {/* ------------------------------------------------------------------ */}
       <section className="w-full bg-[#0d0f14] py-16 sm:py-20 border-t border-neutral-800 text-white">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header da Seção */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 sm:mb-14 gap-4 border-b border-neutral-800 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 sm:mb-14 gap-4 border-b border-neutral-800 pb-6 text-left">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <MessageSquareQuote className="w-4 h-4 text-[#ff6305]" />
@@ -301,62 +295,58 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Grid de Entrevistas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
+          {/* Grid de Entrevistas no Padrão Editorial Empilhado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {interviewPosts.map((interview) => (
               <article
                 key={interview.id}
-                className="w-full group flex flex-col bg-neutral-900 border border-neutral-800 rounded-none overflow-hidden hover:border-[#ff6305]/60 transition-all duration-300"
+                className="w-full group flex flex-col items-start text-left bg-neutral-900/60 p-5 border border-neutral-800 rounded-none hover:border-[#ff6305]/60 transition-all duration-300"
               >
+                {/* 1. Imagem no Topo limpa */}
                 <Link
                   href={`/post/${interview.slug}`}
-                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-950"
+                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-950 rounded-none border border-neutral-800"
                 >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-                    style={{ backgroundImage: `url('${interview.imageWeb}')` }}
+                  <img
+                    src={interview.imageWeb}
+                    alt={interview.title}
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className="font-alleron px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider bg-[#ff6305] text-white">
-                      Entrevista
-                    </span>
-                  </div>
                 </Link>
 
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="text-[11px] text-neutral-400 font-medium mb-2.5 flex items-center justify-between">
-                      <span>Por {interview.author?.name || "Redação Belezura"}</span>
-                      <span className="flex items-center gap-1 text-neutral-400">
-                        <Clock className="w-3 h-3 text-[#ff6305]" />
-                        {getReadingTime(interview.content)}
-                      </span>
-                    </div>
+                {/* Crédito */}
+                <div className="mt-1.5 text-[10px] text-neutral-500 flex items-center gap-1">
+                  <span>Fonte:</span>
+                  <span className="text-neutral-400 truncate">{interview.imageSourceText || "Editorial"}</span>
+                </div>
 
-                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-white group-hover:text-[#ff6305] transition-colors leading-snug break-words">
-                      <Link href={`/post/${interview.slug}`}>
-                        {interview.title}
-                      </Link>
-                    </h3>
+                {/* 2. Categoria em Destaque */}
+                <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
+                  {interview.category?.name || "Entrevista"}
+                </span>
 
-                    {interview.subtitle && (
-                      <p className="mt-2.5 text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-light">
-                        {interview.subtitle}
-                      </p>
-                    )}
-                  </div>
+                {/* 3. Título / Manchete */}
+                <h3 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-white group-hover:text-[#ff6305] transition-colors leading-snug">
+                  <Link href={`/post/${interview.slug}`}>
+                    {interview.title}
+                  </Link>
+                </h3>
 
-                  <div className="pt-4 mt-5 border-t border-neutral-800 flex items-center justify-between">
-                    <Link
-                      href={`/post/${interview.slug}`}
-                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                    >
-                      Ler entrevista <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                    <span className="text-[11px] text-neutral-500 font-medium">
-                      {formatDate(interview.createdAt)}
-                    </span>
-                  </div>
+                {interview.subtitle && (
+                  <p className="mt-2 text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-light">
+                    {interview.subtitle}
+                  </p>
+                )}
+
+                <div className="pt-3 mt-4 border-t border-neutral-800 flex items-center justify-between w-full text-[11px] text-neutral-400">
+                  <Link
+                    href={`/post/${interview.slug}`}
+                    className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                  >
+                    <span>Ler entrevista</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <span>{formatDate(interview.createdAt)}</span>
                 </div>
               </article>
             ))}
@@ -365,11 +355,11 @@ export default async function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* SEÇÃO BLZURA NEWS (ANTIGO RADAR): ÚLTIMAS PAUTAS & TENDÊNCIAS     */}
+      {/* SEÇÃO BLZURA NEWS: ÚLTIMAS PAUTAS & TENDÊNCIAS                     */}
       {/* ------------------------------------------------------------------ */}
       <section className="w-full bg-white py-14 sm:py-20 border-t border-neutral-200/80">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4 border-b border-neutral-200 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4 border-b border-neutral-200 pb-6 text-left">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-[#ff6305]" />
@@ -377,7 +367,7 @@ export default async function HomePage() {
                   BLZURA News
                 </span>
               </div>
-              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-neutral-950 tracking-tight break-words">
+              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-black tracking-tight break-words">
                 Últimas Pautas & Tendências
               </h2>
             </div>
@@ -390,30 +380,27 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Cards Dinâmicos com Estilo Editorial e Cantos Vivos (rounded-none) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
+          {/* Cards Dinâmicos com Estilo Editorial Empilhado Verticalmente */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 w-full">
             {newsPostsToDisplay.map((card) => (
               <article
                 key={card.id}
-                className="w-full group flex flex-col bg-[#FAF9F6] rounded-none overflow-hidden border border-neutral-200/80 hover:border-[#ff6305]/50 hover:shadow-lg transition-all duration-300"
+                className="w-full group flex flex-col items-start text-left bg-white border border-neutral-200/80 p-5 rounded-none hover:border-[#ff6305]/60 hover:shadow-lg transition-all duration-300"
               >
+                {/* 1. Imagem no Topo limpa (sem badge por cima, sem overlay) */}
                 <Link
                   href={`/post/${card.slug}`}
-                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100"
+                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/60"
                 >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-                    style={{ backgroundImage: `url('${card.imageWeb}')` }}
+                  <img
+                    src={card.imageWeb}
+                    alt={card.title}
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className="font-alleron px-3 py-1 rounded-none text-[11px] font-bold uppercase tracking-wider bg-white/95 text-neutral-900 border border-neutral-200 shadow-sm backdrop-blur-md">
-                      {card.category?.name || "Geral"}
-                    </span>
-                  </div>
                 </Link>
 
                 {/* Crédito obrigatório de fonte abaixo da imagem */}
-                <div className="px-5 pt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
+                <div className="mt-1.5 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
                   <span className="text-neutral-400">Fonte:</span>
                   <a
                     href={card.imageSourceUrl || "#"}
@@ -426,39 +413,41 @@ export default async function HomePage() {
                   </a>
                 </div>
 
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="text-[11px] text-neutral-400 font-medium mb-2 flex items-center justify-between">
-                      <span>{card.author?.name || "Redação Belezura"}</span>
-                      <span>{formatDate(card.createdAt)}</span>
-                    </div>
-                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
-                      <Link href={`/post/${card.slug}`}>
-                        {card.title}
-                      </Link>
-                    </h3>
-                    {card.subtitle && (
-                      <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed break-words font-light">
-                        {card.subtitle}
-                      </p>
-                    )}
-                  </div>
+                {/* 2. Categoria em Destaque (abaixo da imagem, uppercase, font-bold, text-[#ff6305]) */}
+                <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
+                  {card.category?.name || "Geral"}
+                </span>
 
-                  <div className="pt-4 mt-4 border-t border-neutral-200/60 flex items-center justify-between">
-                    <Link
-                      href={`/post/${card.slug}`}
-                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                    >
-                      Ler matéria completa <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                    <button
-                      type="button"
-                      aria-label="Salvar notícia"
-                      className="text-neutral-400 hover:text-neutral-900 p-1 rounded-none hover:bg-neutral-200/50 transition-colors"
-                    >
-                      <Bookmark className="w-4 h-4" />
-                    </button>
-                  </div>
+                {/* 3. Título / Manchete (texto preto, font-recoleta text-lg sm:text-xl) */}
+                <h3 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-black group-hover:text-[#ff6305] transition-colors leading-snug">
+                  <Link href={`/post/${card.slug}`}>
+                    {card.title}
+                  </Link>
+                </h3>
+
+                {/* Subtítulo */}
+                {card.subtitle && (
+                  <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed font-light">
+                    {card.subtitle}
+                  </p>
+                )}
+
+                {/* Metadados e CTA */}
+                <div className="pt-4 mt-4 border-t border-neutral-200/60 flex items-center justify-between w-full">
+                  <Link
+                    href={`/post/${card.slug}`}
+                    className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                  >
+                    <span>Ler matéria completa</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label="Salvar notícia"
+                    className="text-neutral-400 hover:text-black p-1 rounded-none hover:bg-neutral-100 transition-colors"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                  </button>
                 </div>
               </article>
             ))}

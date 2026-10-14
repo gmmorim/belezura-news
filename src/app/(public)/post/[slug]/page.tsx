@@ -497,41 +497,46 @@ export default async function PostDetailPage({
           {displayRecommended.map((item) => (
             <article
               key={item.slug}
-              className="flex flex-col bg-white rounded-none border border-neutral-200/80 overflow-hidden shadow-sm hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-300 group"
+              className="flex flex-col items-start text-left bg-white p-5 rounded-none border border-neutral-200/80 shadow-sm hover:border-[#ff6305]/60 hover:shadow-md transition-all duration-300 group"
             >
-              <Link href={`/post/${item.slug}`} className="block relative aspect-[16/10] overflow-hidden bg-neutral-100 rounded-none">
+              {/* 1. Imagem no Topo (limpa, sem badge por cima) */}
+              <Link href={`/post/${item.slug}`} className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/60">
                 <img
                   src={item.imageWeb}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <span className="font-alleron absolute top-3 left-3 px-2.5 py-0.5 rounded-none text-[10px] font-bold uppercase tracking-wider bg-[#ff6305] text-white shadow-sm">
-                  {item.category}
-                </span>
               </Link>
 
               {/* Fonte obrigatória */}
-              <div className="px-5 pt-2 text-[10px] text-neutral-400 flex items-center gap-1">
+              <div className="mt-1.5 text-[10px] text-neutral-400 flex items-center gap-1">
                 <span>Fonte:</span>
                 <span className="text-neutral-500 truncate">{item.imageSourceText}</span>
               </div>
 
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                <div className="space-y-2">
-                  <h4 className="font-recoleta text-lg font-normal text-neutral-950 group-hover:text-[#ff6305] transition-colors leading-snug line-clamp-2">
-                    <Link href={`/post/${item.slug}`}>
-                      {item.title}
-                    </Link>
-                  </h4>
-                  <p className="text-xs text-neutral-600 line-clamp-2 font-light">
-                    {item.subtitle}
-                  </p>
-                </div>
+              {/* 2. Categoria em Destaque (abaixo da imagem, uppercase, font-bold, text-[#ff6305]) */}
+              <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
+                {item.category}
+              </span>
 
-                <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400">
-                  <span>Por {item.author}</span>
-                  <span>{item.date}</span>
-                </div>
+              {/* 3. Título / Manchete (texto preto, font-recoleta text-lg sm:text-xl) */}
+              <h4 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-black group-hover:text-[#ff6305] transition-colors leading-snug line-clamp-2">
+                <Link href={`/post/${item.slug}`}>
+                  {item.title}
+                </Link>
+              </h4>
+
+              {/* Subtítulo */}
+              {item.subtitle && (
+                <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 font-light">
+                  {item.subtitle}
+                </p>
+              )}
+
+              {/* Metadados */}
+              <div className="pt-3 mt-4 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-400 w-full">
+                <span>Por {item.author}</span>
+                <span>{item.date}</span>
               </div>
             </article>
           ))}

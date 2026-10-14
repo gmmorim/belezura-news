@@ -120,18 +120,22 @@ export default async function CategoryFeedPage({
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="group flex flex-col bg-white rounded-none overflow-hidden border border-neutral-200/80 hover:border-[#ff6305]/60 hover:shadow-lg transition-all duration-300"
+                className="group flex flex-col items-start text-left bg-white p-5 rounded-none border border-neutral-200/80 hover:border-[#ff6305]/60 hover:shadow-lg transition-all duration-300"
               >
-                {/* Imagem do Card */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100 rounded-none">
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
-                    style={{ backgroundImage: `url('${post.imageWeb}')` }}
+                {/* 1. Imagem no Topo (limpa, object-cover, rounded-none) */}
+                <Link
+                  href={`/post/${post.slug}`}
+                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-100 rounded-none border border-neutral-200/60"
+                >
+                  <img
+                    src={post.imageWeb}
+                    alt={post.title}
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   />
-                </div>
+                </Link>
 
                 {/* Crédito obrigatório de fonte abaixo da imagem */}
-                <div className="px-5 pt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
+                <div className="mt-1.5 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1">
                   <span className="text-neutral-400">Fonte:</span>
                   <a
                     href={post.imageSourceUrl || "#"}
@@ -144,37 +148,35 @@ export default async function CategoryFeedPage({
                   </a>
                 </div>
 
-                {/* Informações da Notícia */}
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="text-[11px] text-neutral-400 font-medium mb-2 flex items-center justify-between">
-                      <span>{post.author?.name || "Redação Belezura"}</span>
-                      <span>{formatDate(post.createdAt)}</span>
-                    </div>
+                {/* 2. Categoria em Destaque (abaixo da imagem, uppercase, font-bold, text-[#ff6305]) */}
+                <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
+                  {post.category?.name || meta.title}
+                </span>
 
-                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug">
-                      <Link href={`/post/${post.slug}`}>{post.title}</Link>
-                    </h3>
+                {/* 3. Título / Manchete (texto preto, font-recoleta text-xl ou text-2xl) */}
+                <h2 className="mt-1.5 font-recoleta text-xl sm:text-2xl font-normal text-black group-hover:text-[#ff6305] transition-colors leading-snug">
+                  <Link href={`/post/${post.slug}`}>{post.title}</Link>
+                </h2>
 
-                    {post.subtitle && (
-                      <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed font-light">
-                        {post.subtitle}
-                      </p>
-                    )}
-                  </div>
+                {/* Subtítulo */}
+                {post.subtitle && (
+                  <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed font-light">
+                    {post.subtitle}
+                  </p>
+                )}
 
-                  <div className="pt-4 mt-4 border-t border-neutral-100 flex items-center justify-between">
-                    <Link
-                      href={`/post/${post.slug}`}
-                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
-                    >
-                      <span>Ler matéria completa</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                    <span className="text-[11px] text-neutral-400">
-                      {getReadingTime(post.content)}
-                    </span>
-                  </div>
+                {/* Metadados e CTA */}
+                <div className="pt-4 mt-4 border-t border-neutral-100 flex items-center justify-between w-full">
+                  <Link
+                    href={`/post/${post.slug}`}
+                    className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                  >
+                    <span>Ler matéria completa</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <span className="text-[11px] text-neutral-400">
+                    {getReadingTime(post.content)}
+                  </span>
                 </div>
               </article>
             ))}
