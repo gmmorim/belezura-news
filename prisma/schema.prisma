@@ -1,0 +1,177 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ---------------------------------------------
+// ENUMS DE ACESSO E STATUS
+// ---------------------------------------------
+
+enum Role {
+  ADMIN
+  REDATOR
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ---------------------------------------------
+// GESTÃO DE USUÁRIOS
+// ---------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  avatarUrl     String?
+  bio           String?
+  role          Role      @default(REDATOR)
+  isActive      Boolean   @default(true)
+  
+  posts         Post[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+// ---------------------------------------------
+// CATEGORIAS & TAXONOMIA
+// ---------------------------------------------
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  
+  posts       Post[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  posts     Post[]    @relation("PostTags")
+  
+  createdAt DateTime  @default(now())
+
+  @@map("tags")
+}
+
+// ---------------------------------------------
+// POSTAGENS & CMS EDITORIAL
+// ---------------------------------------------
+
+model Post {
+  id               String      @id @default(cuid())
+  title            String
+  slug             String      @unique
+  subtitle         String?
+  content          String      @db.Text
+  
+  imageWeb         String      // Imagem otimizada para Desktop / Open Graph (1200x630)
+  imageMobile      String?     // Imagem com enquadramento para Mobile
+  imageSourceText  String?
+  imageSourceUrl   String?
+  
+  status           PostStatus  @default(DRAFT)
+  
+  // Contador desnormalizado para leituras instantâneas O(1)
+  views            Int         @default(0)
+  publishedAt      DateTime?
+  
+  radarSourceUrl   String?
+  
+  categoryId       String
+  category         Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  authorId         String
+  author           User        @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  tags             Tag[]       @relation("PostTags")
+  
+  // Relacionamento com histórico de visualizações
+  viewLogs         PostView[]
+  
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([slug])
+  @@index([status, publishedAt])
+  @@index([categoryId, publishedAt])
+  @@map("posts")
+}
+
+// ---------------------------------------------
+// LOGS DE AUDIÊNCIA TEMPORAL & ANTI-SPAM
+// ---------------------------------------------
+
+model PostView {
+  id          String   @id @default(cuid())
+  postId      String
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  // Hash unidirecional de sessão/IP para deduplicação sem violação de privacidade
+  sessionHash String?
+  
+  createdAt   DateTime @default(now())
+
+  @@index([postId, createdAt])
+  @@index([createdAt])
+  @@map("post_views")
+}
+
+// ---------------------------------------------
+// CONVERSÃO & LEADS (NEWSLETTER)
+// ---------------------------------------------
+
+model NewsletterSubscriber {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  isActive         Boolean   @default(true)
+  source           String    @default("footer")
+  
+  // Consentimento & Opt-in LGPD
+  consentGiven     Boolean   @default(true)
+  consentAt        DateTime  @default(now())
+  consentIpHash    String?   // Hash SHA-256 do IP no opt-in (audit trail sem dados pessoais expostos)
+  
+  // Mecanismo Seguro de Unsubscribe (1-clique sem exigência de login)
+  unsubscribeToken String    @unique @default(cuid())
+  unsubscribedAt   DateTime?
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([unsubscribeToken])
+  @@map("newsletter_subscribers")
+}
+
+// ---------------------------------------------
+// TEXTOS VITAIS & CONFIGURAÇÕES (ADMIN ONLY)
+// ---------------------------------------------
+
+model SiteConfig {
+  id          String    @id @default(cuid())
+  key         String    @unique
+  value       String    @db.Text
+  updatedAt   DateTime  @updatedAt
+
+  @@map("site_configs")
+}

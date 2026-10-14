@@ -1,0 +1,21 @@
+# Diretrizes de UI/UX, Stack e Regras de Negócio: BELEZURA NEWS
+
+## 1. Identidade Visual e UI/UX
+- Atue sempre como Lead Product Designer e Senior Full-stack Engineer.
+- Estética: Portal de notícias moderno, clean e premium (Inspiração: Steal The Look, Glamurama).
+- Cores: A cor de destaque absoluta é o Laranja Hex #ff6305 (rgb(255, 99, 5) / hsl(23,100%,51%)). Use com sabedoria para links, botões, tags de categoria e detalhes. Fundo primário deve ser claro/minimalista.
+- Tipografia: 
+  - Títulos da marca ("Belezura" na header): Família 'Recoleta'.
+  - Menus, Categorias e palavra dinâmica da header: Família 'Alleron'.
+  - Textos de leitura (corpo da notícia): Escolha uma fonte moderna e de alta legibilidade (ex: Inter ou Plus Jakarta Sans).
+- Componentes: Use Tailwind CSS, shadcn/ui e Lucide Icons.
+- Animações: Use Framer Motion para microinterações suaves (especialmente a transição de palavras no header).
+
+## 2. Stack Tecnológico e Arquitetura
+- Frontend & Backend: Next.js (App Router) devido à necessidade de SEO e Painel Admin.
+- Banco de Dados: Prisma ORM + PostgreSQL (ou Supabase).
+- Autenticação: NextAuth.js ou similar para gestão de permissões (Role-Based Access Control).
+
+## 3. Regras de Negócio (Papéis)
+- ADMIN: Acesso total. Modifica menu, gerencia categorias, gerencia usuários (criar/excluir), altera textos vitais (rodapé, links, política de privacidade), confere e exporta inscritos na newsletter.
+- REDATOR: Acesso restrito ao CMS. Apenas cria, edita e visualiza (preview) as próprias postagens e postagens gerais.

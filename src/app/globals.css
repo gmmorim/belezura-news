@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-primary: #ff6305;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Definição das fontes locais com fallback de alta elegância */
+  @font-face {
+    font-family: 'Recoleta';
+    src: local('Recoleta'), local('Recoleta-Bold'), url('/fonts/Recoleta-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Recoleta';
+    src: local('Recoleta Regular'), local('Recoleta-Regular'), url('/fonts/Recoleta-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Alleron';
+    src: local('Alleron'), local('Alleron-Bold'), url('/fonts/Alleron-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Alleron';
+    src: local('Alleron Regular'), local('Alleron-Regular'), url('/fonts/Alleron-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* Seleção de texto com a cor oficial da marca */
+  ::selection {
+    background-color: #ff6305;
+    color: #ffffff;
+  }
+
+  body {
+    @apply bg-[#FAF9F6] text-neutral-900 antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Utilitários para mobile e animações */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
