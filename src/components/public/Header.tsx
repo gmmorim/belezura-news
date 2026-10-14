@@ -34,7 +34,7 @@ export function Header() {
 
   return (
     <>
-      <header className="w-full bg-[#FAF9F6] border-b border-neutral-200/70">
+      <header className="w-full bg-[#FAF9F6] border-b border-neutral-200/70 relative z-50">
         {/* Barra de Utilidades Editorial Superior */}
         <div className="border-b border-neutral-200/50 text-[11px] sm:text-xs text-neutral-500 font-medium">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between">
@@ -126,7 +126,7 @@ export function Header() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-neutral-200 relative z-30"
+                className="mt-4 pt-4 border-t border-neutral-200 relative z-50"
               >
                 <SearchBar
                   autoFocus
@@ -141,7 +141,7 @@ export function Header() {
       {/* Menu Drawer Mobile (Sheet de Navegação com Alta Usabilidade) */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 md:hidden flex">
+          <div className="fixed inset-0 z-[100] md:hidden flex">
             {/* Backdrop com desfoque */}
             <motion.div
               initial={{ opacity: 0 }}

@@ -189,7 +189,7 @@ export function SearchBar({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute left-0 right-0 top-full mt-2.5 z-50 bg-white/95 backdrop-blur-md rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden max-h-[460px] overflow-y-auto"
+            className="absolute left-0 right-0 top-full mt-2.5 z-[99] bg-white/95 backdrop-blur-md rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden max-h-[460px] overflow-y-auto overscroll-contain"
           >
             {/* Estado: Carregando Inicial */}
             {isLoading && results.length === 0 && (
