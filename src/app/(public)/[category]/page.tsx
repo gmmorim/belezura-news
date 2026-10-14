@@ -97,12 +97,12 @@ export default async function CategoryFeedPage({
       <section className="bg-white border-b border-neutral-200/80 py-10 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl space-y-3">
-            <span className="font-alleron inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-orange-50 text-[#ff6305] border border-orange-200">
+            <span className="font-alleron inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-xs font-bold uppercase tracking-widest bg-orange-50 text-[#ff6305] border border-orange-200">
               <Sparkles className="w-3.5 h-3.5" />
               <span>{meta.badge}</span>
             </span>
 
-            <h1 className="font-recoleta text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-neutral-950">
+            <h1 className="font-recoleta text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-neutral-950">
               {meta.title}
             </h1>
 
@@ -120,10 +120,10 @@ export default async function CategoryFeedPage({
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-neutral-200/80 hover:shadow-lg transition-all duration-300"
+                className="group flex flex-col bg-white rounded-none overflow-hidden border border-neutral-200/80 hover:border-[#ff6305]/60 hover:shadow-lg transition-all duration-300"
               >
                 {/* Imagem do Card */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
+                <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100 rounded-none">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
                     style={{ backgroundImage: `url('${post.imageWeb}')` }}
@@ -152,7 +152,7 @@ export default async function CategoryFeedPage({
                       <span>{formatDate(post.createdAt)}</span>
                     </div>
 
-                    <h3 className="font-recoleta text-lg sm:text-xl font-bold text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug">
+                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug">
                       <Link href={`/post/${post.slug}`}>{post.title}</Link>
                     </h3>
 
@@ -190,7 +190,7 @@ export default async function CategoryFeedPage({
             <div className="pt-2">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider hover:bg-[#ff6305] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider hover:bg-[#ff6305] transition-colors"
               >
                 Voltar à Capa
               </Link>

@@ -40,22 +40,22 @@ export function InlineNewsletterBox() {
   };
 
   return (
-    <div className="w-full my-12 p-6 sm:p-8 rounded-3xl bg-neutral-900 text-white relative overflow-hidden border border-neutral-800 shadow-xl">
+    <div className="w-full my-12 p-6 sm:p-8 rounded-none bg-neutral-900 text-white relative overflow-hidden border border-neutral-800 shadow-xl">
       {/* Glow de fundo */}
       <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#ff6305]/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-2xl mx-auto text-center space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-orange-400 text-xs font-bold uppercase tracking-wider">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none bg-white/10 text-orange-400 text-xs font-bold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Curadoria Editorial</span>
         </div>
 
-        <h3 className="font-recoleta text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+        <h3 className="font-recoleta text-2xl sm:text-3xl font-normal tracking-tight text-white leading-tight">
           Inscreva-se na nossa Newsletter
         </h3>
 
         <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-lg mx-auto">
-          Receba o <strong className="text-white">Belezura Drops</strong> com as principais notícias, lançamentos e bastidores da beleza diretamente na sua caixa de entrada toda manhã.
+          Receba o <strong className="text-white font-medium">Belezura Drops</strong> com as principais notícias, lançamentos e bastidores da beleza diretamente na sua caixa de entrada toda manhã.
         </p>
 
         {status === "success" ? (
@@ -74,14 +74,14 @@ export function InlineNewsletterBox() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Digite seu melhor e-mail..."
-                  className="w-full pl-10 pr-4 py-3 bg-neutral-950/80 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#ff6305] transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-neutral-950/80 border border-neutral-700 rounded-none text-sm text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#ff6305] transition-all"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full sm:w-auto font-alleron px-5 py-3 rounded-xl bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95 disabled:opacity-50 shrink-0 inline-flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto font-alleron px-5 py-3 rounded-none bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95 disabled:opacity-50 shrink-0 inline-flex items-center justify-center gap-1.5"
               >
                 {status === "loading" ? (
                   <span>Enviando...</span>

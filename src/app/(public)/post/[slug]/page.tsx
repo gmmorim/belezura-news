@@ -311,7 +311,7 @@ export default async function PostDetailPage({
       {/* ------------------------------------------------------------- */}
       <header className="max-w-4xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-6">
         <div className="flex items-center gap-2">
-          <span className="font-alleron px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-[#ff6305] text-white shadow-sm">
+          <span className="font-alleron px-3.5 py-1 rounded-none text-xs font-bold uppercase tracking-widest bg-[#ff6305] text-white shadow-sm">
             {post.category}
           </span>
           <span className="text-xs text-neutral-400 flex items-center gap-1 font-medium">
@@ -320,7 +320,7 @@ export default async function PostDetailPage({
         </div>
 
         {/* Título Grande na Tipografia Recoleta */}
-        <h1 className="font-recoleta text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-950 leading-[1.12]">
+        <h1 className="font-recoleta text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-neutral-950 leading-[1.12]">
           {post.title}
         </h1>
 
@@ -334,7 +334,7 @@ export default async function PostDetailPage({
         {/* Linha Editorial do Autor, Data e Compartilhamento */}
         <div className="pt-4 pb-2 border-y border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shrink-0">
+            <div className="w-10 h-10 rounded-none bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shrink-0">
               {post.author.charAt(0)}
             </div>
             <div>
@@ -355,7 +355,7 @@ export default async function PostDetailPage({
 
       {/* Imagem de Capa (Hero) Responsiva com Créditos Obrigatórios */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
-        <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-sm">
+        <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full rounded-none overflow-hidden bg-neutral-100 border border-neutral-200/80 shadow-sm">
           <picture>
             <source media="(max-width: 640px)" srcSet={post.imageMobile} />
             <source media="(min-width: 641px)" srcSet={post.imageWeb} />
@@ -426,7 +426,7 @@ export default async function PostDetailPage({
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white border border-neutral-200 text-neutral-700"
+                  className="text-xs font-semibold px-3 py-1.5 rounded-none bg-white border border-neutral-200 text-neutral-700"
                 >
                   #{tag}
                 </span>
@@ -436,12 +436,12 @@ export default async function PostDetailPage({
         )}
 
         {/* Box do Autor */}
-        <div className="mt-12 p-6 rounded-2xl bg-white border border-neutral-200/80 flex items-center gap-4 shadow-sm">
-          <div className="w-14 h-14 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-lg shrink-0">
+        <div className="mt-12 p-6 rounded-none bg-white border border-neutral-200/80 flex items-center gap-4 shadow-sm">
+          <div className="w-14 h-14 rounded-none bg-neutral-900 text-white flex items-center justify-center font-bold text-lg shrink-0">
             {post.author.charAt(0)}
           </div>
           <div>
-            <h4 className="font-recoleta text-lg font-bold text-neutral-900">
+            <h4 className="font-recoleta text-lg font-normal text-neutral-900">
               {post.author}
             </h4>
             <p className="text-xs text-[#ff6305] font-semibold uppercase tracking-wider font-alleron">
@@ -479,7 +479,7 @@ export default async function PostDetailPage({
                 Curadoria Relacionada
               </span>
             </div>
-            <h3 className="font-recoleta text-2xl sm:text-3xl font-bold text-neutral-950 tracking-tight">
+            <h3 className="font-recoleta text-2xl sm:text-3xl font-normal text-neutral-950 tracking-tight">
               Matérias Recomendadas
             </h3>
           </div>
@@ -497,15 +497,15 @@ export default async function PostDetailPage({
           {displayRecommended.map((item) => (
             <article
               key={item.slug}
-              className="flex flex-col bg-white rounded-2xl border border-neutral-200/80 overflow-hidden shadow-sm hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-300 group"
+              className="flex flex-col bg-white rounded-none border border-neutral-200/80 overflow-hidden shadow-sm hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-300 group"
             >
-              <Link href={`/post/${item.slug}`} className="block relative aspect-[16/10] overflow-hidden bg-neutral-100">
+              <Link href={`/post/${item.slug}`} className="block relative aspect-[16/10] overflow-hidden bg-neutral-100 rounded-none">
                 <img
                   src={item.imageWeb}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <span className="font-alleron absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#ff6305] text-white shadow-sm">
+                <span className="font-alleron absolute top-3 left-3 px-2.5 py-0.5 rounded-none text-[10px] font-bold uppercase tracking-wider bg-[#ff6305] text-white shadow-sm">
                   {item.category}
                 </span>
               </Link>
@@ -518,7 +518,7 @@ export default async function PostDetailPage({
 
               <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                 <div className="space-y-2">
-                  <h4 className="font-recoleta text-lg font-bold text-neutral-950 group-hover:text-[#ff6305] transition-colors leading-snug line-clamp-2">
+                  <h4 className="font-recoleta text-lg font-normal text-neutral-950 group-hover:text-[#ff6305] transition-colors leading-snug line-clamp-2">
                     <Link href={`/post/${item.slug}`}>
                       {item.title}
                     </Link>

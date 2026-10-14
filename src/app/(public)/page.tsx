@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { ArrowUpRight, Sparkles, TrendingUp, Clock, Bookmark } from "lucide-react";
+import { ArrowUpRight, Sparkles, Clock, Bookmark, MessageSquareQuote } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -49,52 +49,62 @@ function formatDate(date: Date): string {
   }).format(new Date(date));
 }
 
-function getCategoryBadgeColor(categorySlug?: string): string {
-  switch (categorySlug?.toLowerCase()) {
-    case "beauty":
-      return "bg-[#ff6305] text-white";
-    case "business":
-      return "bg-neutral-900 text-white";
-    case "fashion":
-      return "bg-rose-700 text-white";
-    case "lifestyle":
-      return "bg-purple-800 text-white";
-    case "reviews":
-      return "bg-emerald-700 text-white";
-    default:
-      return "bg-neutral-800 text-white";
-  }
-}
-
 // ============================================================================
 // SERVER COMPONENT PRINCIPAL DA HOME PAGE
 // ============================================================================
 export default async function HomePage() {
-  // 1. Capa da Semana (Hero): O post publicado mais recente
-  const heroPost = await prisma.post.findFirst({
+  // 1. Top 3 Matérias Publicadas para o Novo Grid Hero Editorial
+  const topPosts = await prisma.post.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { createdAt: "desc" },
+    take: 3,
     include: {
       category: true,
       author: true,
     },
   });
 
-  // 2. Mais Lidas da Semana: Ordenadas pelo número de views (decrescente)
-  const mostReadPosts = await prisma.post.findMany({
-    where: { status: "PUBLISHED" },
+  const heroPost = topPosts[0];
+  const sideHeroPosts = topPosts.slice(1, 3);
+
+  // 2. Seção "BLZURA Entrevistas": Matérias de entrevistas / grandes reportagens
+  let interviewPosts = await prisma.post.findMany({
+    where: {
+      status: "PUBLISHED",
+      OR: [
+        { category: { slug: "entrevistas" } },
+        { category: { slug: "business" } },
+        { category: { slug: "lifestyle" } },
+        { title: { contains: "entrevista" } },
+        { subtitle: { contains: "entrevista" } },
+      ],
+    },
     orderBy: { views: "desc" },
-    take: 4,
+    take: 3,
     include: {
       category: true,
       author: true,
     },
   });
 
-  // 3. Radar Belezura / Últimas Pautas: Ordenadas por data de criação
-  const latestPosts = await prisma.post.findMany({
+  // Fallback caso não haja matérias com essas tags/categorias específicas
+  if (interviewPosts.length === 0) {
+    interviewPosts = await prisma.post.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { views: "desc" },
+      take: 3,
+      include: {
+        category: true,
+        author: true,
+      },
+    });
+  }
+
+  // 3. Seção "BLZURA News": Últimas Pautas & Tendências (exclui o Hero se possível)
+  const blzuraNewsPosts = await prisma.post.findMany({
     where: { status: "PUBLISHED" },
     orderBy: { createdAt: "desc" },
+    skip: topPosts.length >= 3 ? 3 : 0,
     take: 6,
     include: {
       category: true,
@@ -102,15 +112,18 @@ export default async function HomePage() {
     },
   });
 
+  // Fallback se o total de posts for pequeno
+  const newsPostsToDisplay = blzuraNewsPosts.length > 0 ? blzuraNewsPosts : topPosts;
+
   // Se o banco estiver completamente vazio (0 posts cadastrados)
   if (!heroPost) {
     return (
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         <div className="max-w-md mx-auto space-y-4">
-          <div className="w-12 h-12 rounded-full bg-orange-50 text-[#ff6305] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-none bg-orange-50 text-[#ff6305] flex items-center justify-center mx-auto border border-[#ff6305]/30">
             <Sparkles className="w-6 h-6" />
           </div>
-          <h1 className="font-recoleta text-2xl sm:text-3xl font-bold text-neutral-900">
+          <h1 className="font-recoleta text-2xl sm:text-3xl font-normal text-neutral-900">
             Nenhuma publicação no momento
           </h1>
           <p className="text-sm text-neutral-500 leading-relaxed">
@@ -124,38 +137,38 @@ export default async function HomePage() {
   return (
     <div className="w-full overflow-hidden">
       {/* ------------------------------------------------------------------ */}
-      {/* SEÇÃO HERO EDITORIAL: CAPA DA SEMANA + MAIS LIDAS                 */}
+      {/* SEÇÃO HERO EDITORIAL: 3 MATÉRIAS (8 COLUNAS + 4 COLUNAS STACKED)   */}
       {/* ------------------------------------------------------------------ */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-10 sm:pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-10 sm:pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch w-full">
           
-          {/* Matéria de Capa Principal (8 Colunas no Desktop) */}
-          <div className="w-full lg:col-span-8 group cursor-pointer">
+          {/* Lado Esquerdo: Matéria de Capa Principal (8 Colunas no Desktop) */}
+          <div className="w-full lg:col-span-8 group cursor-pointer flex flex-col">
             <Link
               href={`/post/${heroPost.slug}`}
-              className="block relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-200/80 shadow-sm min-h-[420px] sm:min-h-[480px] lg:min-h-[560px] flex flex-col justify-end"
+              className="block relative w-full rounded-none overflow-hidden bg-neutral-900 border border-neutral-200/80 shadow-sm min-h-[460px] sm:min-h-[520px] lg:min-h-[600px] flex-1 flex flex-col justify-end"
             >
-              {/* Background com imagem dinâmica do Prisma */}
+              {/* Imagem de Fundo com Zoom Suave */}
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
                 style={{
                   backgroundImage: `url('${heroPost.imageWeb}')`,
                 }}
               />
-              {/* Gradiente escuro para legibilidade máxima do texto */}
+              {/* Gradiente Editorial Escuro para Legibilidade */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
 
-              {/* Badges de Contexto no Topo */}
+              {/* Badges de Contexto com Cantos Vivos (rounded-none) */}
               <div className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center gap-2 z-10 flex-wrap">
-                <span className="font-alleron px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-[#ff6305] text-white shadow-md">
+                <span className="font-alleron px-3 py-1 rounded-none text-xs font-bold uppercase tracking-widest bg-[#ff6305] text-white shadow-md">
                   {heroPost.category?.name || "Editorial"}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md text-white border border-white/20">
+                <span className="font-alleron px-3 py-1 rounded-none text-xs font-bold bg-white/20 backdrop-blur-md text-white border border-white/20 uppercase tracking-wider">
                   Capa da Semana
                 </span>
               </div>
 
-              {/* Informações da Notícia */}
+              {/* Informações da Matéria */}
               <div className="relative z-10 p-5 sm:p-7 md:p-8 text-white w-full space-y-2 sm:space-y-3">
                 <div className="flex items-center gap-2.5 text-xs text-neutral-300 font-medium">
                   <span>Por {heroPost.author?.name || "Redação Belezura"}</span>
@@ -166,12 +179,12 @@ export default async function HomePage() {
                   </span>
                 </div>
 
-                {/* Título Responsivo */}
-                <h1 className="font-recoleta text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-snug sm:leading-tight break-words group-hover:text-orange-200 transition-colors">
+                {/* Título Principal */}
+                <h1 className="font-recoleta text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal tracking-tight text-white leading-snug sm:leading-tight break-words group-hover:text-orange-200 transition-colors">
                   {heroPost.title}
                 </h1>
 
-                {/* Subtítulo / Linha fina */}
+                {/* Subtítulo / Linha Fina */}
                 {heroPost.subtitle && (
                   <p className="text-xs sm:text-sm md:text-base text-neutral-200 line-clamp-2 max-w-2xl font-light leading-relaxed break-words">
                     {heroPost.subtitle}
@@ -180,7 +193,7 @@ export default async function HomePage() {
               </div>
             </Link>
 
-            {/* Crédito obrigatório de fonte abaixo da imagem */}
+            {/* Crédito obrigatório de fonte */}
             <div className="mt-2 text-[10px] sm:text-[11px] text-neutral-500 flex items-center gap-1.5 px-1">
               <span className="font-semibold text-neutral-400">Fonte:</span>
               <a
@@ -195,73 +208,181 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Coluna Lateral: Mais Lidas da Semana (4 Colunas no Desktop) */}
-          <div className="w-full lg:col-span-4 flex flex-col gap-4 sm:gap-5">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-200">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-[#ff6305]" />
-                <h2 className="font-alleron text-xs font-bold uppercase tracking-widest text-neutral-900">
-                  Mais Lidas da Semana
-                </h2>
-              </div>
-              <span className="text-[11px] font-bold text-[#ff6305] uppercase tracking-wider">
-                Em Alta
-              </span>
-            </div>
-
-            {/* Lista Real de Matérias Ordenadas por Views */}
-            {mostReadPosts.length > 0 ? (
-              mostReadPosts.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/post/${item.slug}`}
-                  className="block w-full p-4 rounded-2xl bg-white border border-neutral-200/80 hover:border-[#ff6305]/40 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden group"
+          {/* Lado Direito: 2 Matérias Menores Empilhadas Verticalmente (4 Colunas) */}
+          <div className="w-full lg:col-span-4 flex flex-col gap-6 justify-between">
+            {sideHeroPosts.length > 0 ? (
+              sideHeroPosts.map((post) => (
+                <article
+                  key={post.id}
+                  className="group flex flex-col bg-white border border-neutral-200/90 rounded-none overflow-hidden hover:border-[#ff6305]/60 hover:shadow-md transition-all duration-300 flex-1"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span
-                      className={`font-alleron text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${getCategoryBadgeColor(
-                        item.category?.slug
-                      )}`}
-                    >
-                      {item.category?.name || "Editorial"}
-                    </span>
-                    <span className="text-[11px] text-neutral-400">
-                      {formatRelativeTime(item.createdAt)}
-                    </span>
+                  <Link
+                    href={`/post/${post.slug}`}
+                    className="block relative aspect-[16/9] w-full overflow-hidden bg-neutral-100"
+                  >
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
+                      style={{ backgroundImage: `url('${post.imageWeb}')` }}
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="font-alleron px-2.5 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider bg-black/85 text-white backdrop-blur-sm">
+                        {post.category?.name || "Editorial"}
+                      </span>
+                    </div>
+                  </Link>
+
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-[11px] text-neutral-400 font-medium">
+                        <span className="flex items-center gap-1 text-neutral-500">
+                          <Clock className="w-3 h-3 text-[#ff6305]" />
+                          {getReadingTime(post.content)}
+                        </span>
+                        <span>{formatRelativeTime(post.createdAt)}</span>
+                      </div>
+
+                      <h2 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
+                        <Link href={`/post/${post.slug}`}>
+                          {post.title}
+                        </Link>
+                      </h2>
+
+                      {post.subtitle && (
+                        <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed font-light">
+                          {post.subtitle}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-3 mt-3 border-t border-neutral-100 flex items-center justify-between">
+                      <Link
+                        href={`/post/${post.slug}`}
+                        className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                      >
+                        <span>Ler matéria</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </Link>
+                      <span className="text-[10px] text-neutral-400">
+                        {post.author?.name || "Redação"}
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="font-sans font-bold text-sm sm:text-base text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
-                    {item.title}
-                  </h3>
-                </Link>
+                </article>
               ))
             ) : (
-              <p className="text-xs text-neutral-400 p-4">
-                Sem matérias adicionais nas mais lidas no momento.
-              </p>
+              <div className="p-6 bg-neutral-50 border border-neutral-200 rounded-none text-neutral-400 text-xs">
+                Aguardando novas pautas para a capa.
+              </div>
             )}
           </div>
         </div>
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* GRID DE NOVIDADES EDITORIAL: ÚLTIMAS PAUTAS & TENDÊNCIAS          */}
+      {/* SEÇÃO INÉDITA: BLZURA ENTREVISTAS (ALTO CONTRASTE EDITORIAL)       */}
       {/* ------------------------------------------------------------------ */}
-      <section className="w-full bg-white py-12 sm:py-16 border-t border-neutral-200/80">
+      <section className="w-full bg-[#0d0f14] py-16 sm:py-20 border-t border-neutral-800 text-white">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4">
+          {/* Header da Seção */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 sm:mb-14 gap-4 border-b border-neutral-800 pb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <MessageSquareQuote className="w-4 h-4 text-[#ff6305]" />
+                <span className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305]">
+                  BLZURA Entrevistas
+                </span>
+              </div>
+              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-white tracking-tight break-words">
+                Grandes Conversas & Bastidores
+              </h2>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-400 max-w-xl font-light">
+                Diálogos com mentes inovadoras, criadores e executivos que definem os rumos da beleza e da moda.
+              </p>
+            </div>
+          </div>
+
+          {/* Grid de Entrevistas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
+            {interviewPosts.map((interview) => (
+              <article
+                key={interview.id}
+                className="w-full group flex flex-col bg-neutral-900 border border-neutral-800 rounded-none overflow-hidden hover:border-[#ff6305]/60 transition-all duration-300"
+              >
+                <Link
+                  href={`/post/${interview.slug}`}
+                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-950"
+                >
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-105"
+                    style={{ backgroundImage: `url('${interview.imageWeb}')` }}
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="font-alleron px-3 py-1 rounded-none text-[10px] font-bold uppercase tracking-wider bg-[#ff6305] text-white">
+                      Entrevista
+                    </span>
+                  </div>
+                </Link>
+
+                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="text-[11px] text-neutral-400 font-medium mb-2.5 flex items-center justify-between">
+                      <span>Por {interview.author?.name || "Redação Belezura"}</span>
+                      <span className="flex items-center gap-1 text-neutral-400">
+                        <Clock className="w-3 h-3 text-[#ff6305]" />
+                        {getReadingTime(interview.content)}
+                      </span>
+                    </div>
+
+                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-white group-hover:text-[#ff6305] transition-colors leading-snug break-words">
+                      <Link href={`/post/${interview.slug}`}>
+                        {interview.title}
+                      </Link>
+                    </h3>
+
+                    {interview.subtitle && (
+                      <p className="mt-2.5 text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-light">
+                        {interview.subtitle}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="pt-4 mt-5 border-t border-neutral-800 flex items-center justify-between">
+                    <Link
+                      href={`/post/${interview.slug}`}
+                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                    >
+                      Ler entrevista <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <span className="text-[11px] text-neutral-500 font-medium">
+                      {formatDate(interview.createdAt)}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------------ */}
+      {/* SEÇÃO BLZURA NEWS (ANTIGO RADAR): ÚLTIMAS PAUTAS & TENDÊNCIAS     */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="w-full bg-white py-14 sm:py-20 border-t border-neutral-200/80">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 sm:mb-12 gap-4 border-b border-neutral-200 pb-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-[#ff6305]" />
                 <span className="font-alleron text-xs font-bold uppercase tracking-widest text-[#ff6305]">
-                  Radar Belezura
+                  BLZURA News
                 </span>
               </div>
-              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-950 tracking-tight break-words">
+              <h2 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-normal text-neutral-950 tracking-tight break-words">
                 Últimas Pautas & Tendências
               </h2>
             </div>
             <Link
-              href="/radar"
+              href="/beauty"
               className="font-alleron inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-800 hover:text-[#ff6305] transition-colors group self-start sm:self-auto"
             >
               <span>Ver feed completo</span>
@@ -269,12 +390,12 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Cards Dinâmicos com Dados Reais do Banco de Dados */}
+          {/* Cards Dinâmicos com Estilo Editorial e Cantos Vivos (rounded-none) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
-            {latestPosts.map((card) => (
+            {newsPostsToDisplay.map((card) => (
               <article
                 key={card.id}
-                className="w-full group flex flex-col bg-[#FAF9F6] rounded-2xl overflow-hidden border border-neutral-200/80 hover:shadow-lg transition-all duration-300"
+                className="w-full group flex flex-col bg-[#FAF9F6] rounded-none overflow-hidden border border-neutral-200/80 hover:border-[#ff6305]/50 hover:shadow-lg transition-all duration-300"
               >
                 <Link
                   href={`/post/${card.slug}`}
@@ -285,7 +406,7 @@ export default async function HomePage() {
                     style={{ backgroundImage: `url('${card.imageWeb}')` }}
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="font-alleron px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-white/95 text-neutral-900 shadow-sm backdrop-blur-md">
+                    <span className="font-alleron px-3 py-1 rounded-none text-[11px] font-bold uppercase tracking-wider bg-white/95 text-neutral-900 border border-neutral-200 shadow-sm backdrop-blur-md">
                       {card.category?.name || "Geral"}
                     </span>
                   </div>
@@ -311,7 +432,7 @@ export default async function HomePage() {
                       <span>{card.author?.name || "Redação Belezura"}</span>
                       <span>{formatDate(card.createdAt)}</span>
                     </div>
-                    <h3 className="font-recoleta text-lg sm:text-xl font-bold text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
+                    <h3 className="font-recoleta text-lg sm:text-xl font-normal text-neutral-900 group-hover:text-[#ff6305] transition-colors leading-snug break-words">
                       <Link href={`/post/${card.slug}`}>
                         {card.title}
                       </Link>
@@ -333,7 +454,7 @@ export default async function HomePage() {
                     <button
                       type="button"
                       aria-label="Salvar notícia"
-                      className="text-neutral-400 hover:text-neutral-900 p-1 rounded-full hover:bg-neutral-200/50 transition-colors"
+                      className="text-neutral-400 hover:text-neutral-900 p-1 rounded-none hover:bg-neutral-200/50 transition-colors"
                     >
                       <Bookmark className="w-4 h-4" />
                     </button>

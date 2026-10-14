@@ -140,7 +140,7 @@ export function SearchBar({
       {/* Campo de Entrada de Busca */}
       <div className="relative flex items-center">
         <Search
-          className="absolute left-4 w-4 h-4 text-neutral-400 pointer-events-none"
+          className="absolute left-4 w-4 h-4 text-black pointer-events-none"
           aria-hidden="true"
         />
 
@@ -158,24 +158,24 @@ export function SearchBar({
           autoFocus={autoFocus}
           aria-autocomplete="list"
           aria-expanded={isOpen}
-          className="w-full pl-11 pr-10 py-2.5 bg-white border border-neutral-200/90 rounded-full text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#ff6305] focus:border-transparent transition-all shadow-sm"
+          className="w-full pl-11 pr-10 py-2.5 bg-white border border-black/30 rounded-none text-sm text-black placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm"
         />
 
         {/* Indicador de Carregamento ou Botão Limpar */}
         <div className="absolute right-3.5 flex items-center">
           {isLoading ? (
             <Loader2
-              className="w-4 h-4 text-[#ff6305] animate-spin"
+              className="w-4 h-4 text-black animate-spin"
               aria-label="Buscando..."
             />
           ) : searchTerm.length > 0 ? (
             <button
               type="button"
               onClick={handleClear}
-              className="p-1 rounded-full text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+              className="p-1 rounded-none text-black hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
               aria-label="Limpar busca"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3.5 h-3.5 text-black" />
             </button>
           ) : null}
         </div>
@@ -189,7 +189,7 @@ export function SearchBar({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute left-0 right-0 top-full mt-2.5 z-[99] bg-white/95 backdrop-blur-md rounded-2xl border border-neutral-200/90 shadow-2xl overflow-hidden max-h-[460px] overflow-y-auto overscroll-contain"
+            className="absolute left-0 right-0 top-full mt-2.5 z-[99] bg-white/95 backdrop-blur-md rounded-none border border-neutral-300 shadow-2xl overflow-hidden max-h-[460px] overflow-y-auto overscroll-contain"
           >
             {/* Estado: Carregando Inicial */}
             {isLoading && results.length === 0 && (
@@ -232,10 +232,10 @@ export function SearchBar({
                       key={post.id}
                       type="button"
                       onClick={() => handleSelect(post.slug)}
-                      className="w-full text-left flex items-start gap-3 p-2.5 rounded-xl hover:bg-neutral-50 transition-colors group cursor-pointer"
+                      className="w-full text-left flex items-start gap-3 p-2.5 rounded-none hover:bg-neutral-50 transition-colors group cursor-pointer"
                     >
                       {/* Thumbnail Otimizada */}
-                      <div className="relative w-16 h-14 sm:w-20 sm:h-16 rounded-lg overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200/60">
+                      <div className="relative w-16 h-14 sm:w-20 sm:h-16 rounded-none overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200/60">
                         <img
                           src={post.imageWeb}
                           alt={post.title}
@@ -246,7 +246,7 @@ export function SearchBar({
                       {/* Informações da Notícia */}
                       <div className="flex-1 min-w-0 pr-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-alleron text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-orange-50 text-[#ff6305] border border-orange-200/50">
+                          <span className="font-alleron text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-black text-white">
                             {post.category.name}
                           </span>
                         </div>

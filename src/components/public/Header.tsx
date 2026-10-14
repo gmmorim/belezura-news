@@ -34,14 +34,14 @@ export function Header() {
 
   return (
     <>
-      <header className="w-full bg-[#FAF9F6] border-b border-neutral-200/70 relative z-50">
+      <header className="w-full bg-[#ff6305] border-b border-black/20 relative z-50 text-black">
         {/* Barra de Utilidades Editorial Superior */}
-        <div className="border-b border-neutral-200/50 text-[11px] sm:text-xs text-neutral-500 font-medium">
+        <div className="border-b border-black/15 text-[11px] sm:text-xs text-black font-medium">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between">
             {/* Data e Localização */}
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#ff6305] animate-ping" />
-              <span className="truncate">{capitalizedDate}</span>
+              <span className="w-2 h-2 rounded-full bg-black animate-ping" />
+              <span className="truncate text-black font-semibold">{capitalizedDate}</span>
             </div>
 
             {/* Links rápidos e acesso ao painel */}
@@ -49,20 +49,20 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setNewsletterModalOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 text-neutral-600 hover:text-[#ff6305] transition-colors cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 text-black hover:opacity-75 transition-opacity cursor-pointer font-medium"
               >
-                <Mail className="w-3.5 h-3.5 text-[#ff6305]" />
+                <Mail className="w-3.5 h-3.5 text-black" />
                 <span>Receba nossa curadoria</span>
               </button>
 
-              <div className="h-3 w-px bg-neutral-200 hidden sm:block" />
+              <div className="h-3 w-px bg-black/20 hidden sm:block" />
 
               <Link
                 href="/admin"
-                className="inline-flex items-center gap-1.5 text-neutral-500 hover:text-neutral-900 transition-colors"
+                className="inline-flex items-center gap-1.5 text-black hover:opacity-75 transition-opacity font-medium"
                 title="Área da Redação / Admin"
               >
-                <Lock className="w-3 h-3 text-neutral-400" />
+                <Lock className="w-3 h-3 text-black" />
                 <span className="text-[11px]">Redação</span>
               </Link>
             </div>
@@ -70,27 +70,27 @@ export function Header() {
         </div>
 
         {/* Área Nobre da Marca (Header Principal) */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-5 md:py-7">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 sm:py-5 md:py-6">
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Lado Esquerdo: Mobile Trigger & Search Desktop */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 w-10 sm:w-auto">
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 w-10 sm:w-28">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full text-neutral-800 hover:text-neutral-950 hover:bg-neutral-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6305]"
+                className="md:hidden inline-flex items-center justify-center w-10 h-10 text-black hover:bg-black/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-black"
                 aria-label="Abrir menu de navegação"
                 aria-expanded={mobileMenuOpen}
               >
-                <Menu className="w-5 h-5" />
+                <Menu className="w-5 h-5 text-black" />
               </button>
 
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="hidden md:inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-neutral-600 hover:text-neutral-950 transition-colors px-3.5 py-1.5 rounded-full hover:bg-neutral-100 border border-neutral-200/80"
+                className="hidden md:inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-black hover:bg-black/10 transition-colors px-3.5 py-1.5 rounded-none border border-black/30"
               >
-                <Search className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="hidden lg:inline">Buscar</span>
+                <Search className="w-3.5 h-3.5 text-black" />
+                <span>Buscar</span>
               </button>
             </div>
 
@@ -99,23 +99,16 @@ export function Header() {
               <AnimatedHeaderLogo />
             </div>
 
-            {/* Lado Direito: Ação de Newsletter / Contato Comercial */}
-            <div className="flex items-center justify-end gap-1.5 sm:gap-3 shrink-0 w-10 sm:w-auto">
+            {/* Lado Direito: Apenas Trigger de Busca Mobile e balanceamento ótico */}
+            <div className="flex items-center justify-end gap-1.5 sm:gap-3 shrink-0 w-10 sm:w-28">
               <button
                 type="button"
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full text-neutral-800 hover:text-neutral-950 hover:bg-neutral-100 transition-colors"
+                className="md:hidden inline-flex items-center justify-center w-10 h-10 text-black hover:bg-black/10 transition-colors"
                 aria-label="Abrir busca"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5 text-black" />
               </button>
-
-              <a
-                href="mailto:comercial@belezuranews.com.br"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full border border-neutral-300/80 text-neutral-800 hover:border-[#ff6305] hover:text-[#ff6305] transition-all duration-200"
-              >
-                <span>Anuncie</span>
-              </a>
             </div>
           </div>
 
@@ -126,7 +119,7 @@ export function Header() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-neutral-200 relative z-50"
+                className="mt-4 pt-4 border-t border-black/20 relative z-50"
               >
                 <SearchBar
                   autoFocus
@@ -162,13 +155,13 @@ export function Header() {
             >
               {/* Topo do Drawer */}
               <div className="p-5 flex items-center justify-between border-b border-neutral-100">
-                <span className="font-recoleta text-2xl font-bold text-neutral-950">
-                  Belezura <span className="font-alleron text-[#ff6305] text-xl">News</span>
+                <span className="font-recoleta text-2xl font-normal text-neutral-950">
+                  Belezura <span className="font-alleron text-[#ff6305] text-xl font-bold italic">News</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-10 h-10 flex items-center justify-center rounded-full text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100"
+                  className="w-10 h-10 flex items-center justify-center rounded-none text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100"
                   aria-label="Fechar menu"
                 >
                   <X className="w-5 h-5" />
@@ -178,34 +171,62 @@ export function Header() {
               {/* Lista de Categorias com Área de Toque Otimizada (48px+) */}
               <div className="p-4 flex-1 space-y-1">
                 <div className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 px-3 py-2">
-                  Editorias
+                  Navegação
                 </div>
-                {CATEGORIES.map((cat) => (
-                  <Link
-                    key={cat.slug}
-                    href={cat.slug}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="font-alleron flex items-center justify-between px-3 py-3 rounded-xl text-neutral-800 hover:text-[#ff6305] hover:bg-orange-50/60 font-semibold text-sm uppercase tracking-wider transition-colors active:bg-orange-100"
-                  >
-                    <span>{cat.name}</span>
-                    <ArrowRight className="w-4 h-4 text-neutral-300" />
-                  </Link>
-                ))}
+                {CATEGORIES.map((cat) => {
+                  const isExternal = !!cat.isExternal;
+                  const isAnchor = cat.slug.startsWith("#");
+
+                  if (isExternal) {
+                    return (
+                      <a
+                        key={cat.name}
+                        href={cat.slug}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="font-alleron flex items-center justify-between px-3 py-3 rounded-none text-neutral-800 hover:text-[#ff6305] hover:bg-orange-50/60 font-semibold text-sm uppercase tracking-wider transition-colors active:bg-orange-100"
+                      >
+                        <span>{cat.name}</span>
+                        <ArrowRight className="w-4 h-4 text-neutral-300" />
+                      </a>
+                    );
+                  }
+
+                  if (isAnchor) {
+                    return (
+                      <a
+                        key={cat.name}
+                        href={cat.slug}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="font-alleron flex items-center justify-between px-3 py-3 rounded-none text-neutral-800 hover:text-[#ff6305] hover:bg-orange-50/60 font-semibold text-sm uppercase tracking-wider transition-colors active:bg-orange-100"
+                      >
+                        <span>{cat.name}</span>
+                        <ArrowRight className="w-4 h-4 text-neutral-300" />
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={cat.slug}
+                      href={cat.slug}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-alleron flex items-center justify-between px-3 py-3 rounded-none text-neutral-800 hover:text-[#ff6305] hover:bg-orange-50/60 font-semibold text-sm uppercase tracking-wider transition-colors active:bg-orange-100"
+                    >
+                      <span>{cat.name}</span>
+                      <ArrowRight className="w-4 h-4 text-neutral-300" />
+                    </Link>
+                  );
+                })}
 
                 <div className="pt-4 border-t border-neutral-100 mt-4 space-y-2">
                   <div className="text-[10px] uppercase font-bold tracking-widest text-neutral-400 px-3">
-                    Institucional & Comercial
+                    Redação & Contato
                   </div>
                   <a
-                    href="mailto:comercial@belezuranews.com.br"
-                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-neutral-700 hover:text-[#ff6305]"
-                  >
-                    <span>Quer anunciar com a gente?</span>
-                    <span className="text-[10px] bg-orange-100 text-[#ff6305] px-2 py-0.5 rounded-full font-bold">Mídia Kit</span>
-                  </a>
-                  <a
                     href="mailto:contato@belezuranews.com.br"
-                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold text-neutral-700 hover:text-neutral-950"
+                    className="flex items-center justify-between px-3 py-2.5 rounded-none text-xs font-semibold text-neutral-700 hover:text-[#ff6305]"
                   >
                     <span>Fale com a redação</span>
                     <span className="text-[10px] text-neutral-400">Email</span>
@@ -213,7 +234,7 @@ export function Header() {
                   <Link
                     href="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-900"
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-none text-xs font-medium text-neutral-500 hover:text-neutral-900"
                   >
                     <Lock className="w-3.5 h-3.5 text-neutral-400" />
                     <span>Acesso Restrito Redação</span>
@@ -235,7 +256,7 @@ export function Header() {
                     setMobileMenuOpen(false);
                     setNewsletterModalOpen(true);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-orange-600 transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider rounded-none hover:bg-orange-600 transition-colors cursor-pointer"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Cadastrar Gratuitamente</span>

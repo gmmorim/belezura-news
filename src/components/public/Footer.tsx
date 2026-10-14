@@ -76,12 +76,12 @@ export function Footer() {
     <footer className="w-full bg-[#111111] text-white pt-16 sm:pt-20 pb-12 border-t border-neutral-800">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Banner de Conversão: Newsletter Exclusiva */}
-        <div className="rounded-3xl bg-neutral-900 border border-neutral-800 p-6 sm:p-10 lg:p-12 mb-16 relative overflow-hidden">
+        <div className="rounded-none bg-neutral-900 border border-neutral-800 p-6 sm:p-10 lg:p-12 mb-16 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-[#ff6305]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#ff6305]/15 text-[#ff6305] border border-[#ff6305]/30 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-[11px] font-bold uppercase tracking-wider bg-[#ff6305]/15 text-[#ff6305] border border-[#ff6305]/30 mb-4">
                 Belezura Drops • Gratuito
               </span>
               <h3 className="font-recoleta text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-tight">
@@ -94,7 +94,7 @@ export function Footer() {
 
             <div className="lg:col-span-5">
               {status === "success" ? (
-                <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">
+                <div className="flex items-center gap-3 p-4 rounded-none bg-emerald-950/60 border border-emerald-500/40 text-emerald-300">
                   <CheckCircle2 className="w-6 h-6 shrink-0" />
                   <p className="text-sm font-medium">
                     Pronto! Você agora faz parte dos insiders do Belezura News.
@@ -110,13 +110,13 @@ export function Footer() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Seu melhor e-mail..."
                       required
-                      className="w-full pl-11 pr-4 py-3.5 rounded-full bg-neutral-800/90 border border-neutral-700 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305] focus:border-transparent transition-all"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-none bg-neutral-800/90 border border-neutral-700 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305] focus:border-transparent transition-all"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="font-alleron whitespace-nowrap inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                    className="font-alleron whitespace-nowrap inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-none bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-lg shadow-orange-500/20 disabled:opacity-50"
                   >
                     <span>{status === "loading" ? "Inscrevendo..." : "Inscreva-se"}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -131,16 +131,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-neutral-800">
           {/* Coluna 1: Marca & Manifesto */}
           <div className="lg:col-span-4 space-y-4">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <span className="font-recoleta text-3xl font-bold text-white tracking-tight">
-                Belezura
-              </span>
-              <span className="font-alleron text-2xl font-extrabold uppercase tracking-wider text-[#ff6305]">
-                News
+            <Link href="/" className="inline-block group">
+              <span className="font-recoleta text-4xl sm:text-5xl font-normal text-white tracking-tight leading-[0.9] block group-hover:text-[#ff6305] transition-colors">
+                Bele<br />zura
               </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
-              O portal contemporâneo que conecta mercado de beleza, moda, tendências de negócios, lifestyle e reviews sinceros.
+              O portal que conecta beleza, moda, negócios e lifestyle, com curadoria de tendências, novidades do mercado e reviews sinceros.
             </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
@@ -149,7 +146,7 @@ export function Footer() {
                   href={socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="Instagram Belezura News"
                 >
                   <Instagram className="w-4 h-4" />
@@ -160,7 +157,7 @@ export function Footer() {
                   href={socialLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="LinkedIn Belezura News"
                 >
                   <Linkedin className="w-4 h-4" />
@@ -171,7 +168,7 @@ export function Footer() {
                   href={socialLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="Twitter / X Belezura News"
                 >
                   <XIcon className="w-4 h-4" />
@@ -182,7 +179,7 @@ export function Footer() {
                   href={socialLinks.threads}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="Threads Belezura News"
                 >
                   <ThreadsIcon className="w-4 h-4" />
@@ -193,7 +190,7 @@ export function Footer() {
                   href={socialLinks.tiktok}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="TikTok Belezura News"
                 >
                   <TikTokIcon className="w-4 h-4" />
@@ -204,7 +201,7 @@ export function Footer() {
                   href={socialLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
+                  className="w-9 h-9 rounded-none bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-[#ff6305] transition-colors"
                   aria-label="YouTube Belezura News"
                 >
                   <Youtube className="w-4 h-4" />
@@ -219,21 +216,49 @@ export function Footer() {
               Editorias
             </p>
             <ul className="space-y-2.5">
-              {CATEGORIES.filter((c) => c.slug !== "/").map((cat) => (
-                <li key={cat.slug}>
-                  <Link
-                    href={cat.slug}
-                    className="text-sm text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5"
-                  >
-                    <span>{cat.name}</span>
-                  </Link>
-                </li>
-              ))}
+              {CATEGORIES.filter((c) => c.slug !== "/").map((cat) => {
+                if (cat.isExternal) {
+                  return (
+                    <li key={cat.name}>
+                      <a
+                        href={cat.slug}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5"
+                      >
+                        <span>{cat.name}</span>
+                      </a>
+                    </li>
+                  );
+                }
+                if (cat.slug.startsWith("#")) {
+                  return (
+                    <li key={cat.name}>
+                      <a
+                        href={cat.slug}
+                        className="text-sm text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5"
+                      >
+                        <span>{cat.name}</span>
+                      </a>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={cat.slug}>
+                    <Link
+                      href={cat.slug}
+                      className="text-sm text-neutral-400 hover:text-white transition-colors flex items-center gap-1.5"
+                    >
+                      <span>{cat.name}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
-          {/* Coluna 3: CTA OBRIGATÓRIO DE ANÚNCIO E CONTATO */}
-          <div className="lg:col-span-5 space-y-4 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800/80">
+          {/* Coluna 3: CONTATO E PARCERIAS */}
+          <div id="contato" className="lg:col-span-5 space-y-4 bg-neutral-900/50 p-6 rounded-none border border-neutral-800/80 scroll-mt-24">
             <div className="flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-[#ff6305]" />
               <p className="font-alleron text-xs font-bold uppercase tracking-widest text-white">
@@ -241,27 +266,16 @@ export function Footer() {
               </p>
             </div>
 
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Posicione sua marca em contato direto com uma audiência qualificada e apaixonada por novidades, produtos e mercado de beleza.
+            <p className="text-sm text-neutral-300 leading-relaxed">
+              Sua marca no radar de quem ama uma novidade de beleza! Conecte-se com uma audiência que respira tendências, testa lançamentos e está sempre de olho no próximo queridinho do mercado.
             </p>
 
-            {/* BOTÃO OBRIGATÓRIO DE CTA PARA O COMERCIAL */}
-            <div className="pt-2">
-              <a
-                href={commercialUrl}
-                className="font-alleron w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#ff6305] text-white text-xs font-bold uppercase tracking-wider hover:bg-orange-600 active:scale-95 transition-all duration-200 shadow-md shadow-orange-500/20"
-              >
-                <span>Quer anunciar com a gente?</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
-
-            {/* TEXTO DE CONTATO SIMPLES */}
-            <div className="pt-2 text-xs text-neutral-400 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+            {/* TEXTO DE CONTATO DESTACADO */}
+            <div className="pt-2 text-sm text-neutral-400 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
               <span>Contato editorial e geral:</span>
               <a
-                href={contactEmail.includes("@") && !contactEmail.startsWith("mailto:") ? `mailto:${contactEmail}` : contactEmail}
-                className="text-neutral-200 hover:text-[#ff6305] font-semibold underline underline-offset-4 decoration-neutral-700 hover:decoration-[#ff6305] transition-colors"
+                href={`mailto:${contactEmail}`}
+                className="text-[#ff6305] hover:underline font-semibold transition-colors"
               >
                 {contactEmail}
               </a>
