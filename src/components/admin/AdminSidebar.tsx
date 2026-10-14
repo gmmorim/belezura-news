@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -19,6 +20,7 @@ import {
   PlusCircle,
   ShieldCheck,
   PenTool,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -43,28 +45,34 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Inscritos Newsletter", href: "/admin/newsletter", icon: Mail, adminOnly: true },
   { label: "Equipe & Acessos", href: "/admin/usuarios", icon: Users, adminOnly: true },
   { label: "Configurações Vitais", href: "/admin/configuracoes", icon: Settings, adminOnly: true },
+  { label: "Meu Perfil", href: "/admin/perfil", icon: User },
 ];
 
 export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   // Em tela de login, não exibe sidebar nem header administrativo
   if (pathname === "/admin/login") {
     return <div className="min-h-screen bg-[#0d0d0d]">{children}</div>;
   }
 
-  // Simulação de usuário autenticado (Role: ADMIN)
+  // Usuário autenticado obtido dinamicamente da sessão NextAuth
   const currentUser = {
-    name: "Helena Castro",
-    email: "helena@belezuranews.com.br",
-    role: "ADMIN" as const, // Alternar para REDATOR em testes
+    name: session?.user?.name || "Redação Belezura",
+    email: session?.user?.email || "admin@belezuranews.com.br",
+    role: ((session?.user as any)?.role as "ADMIN" | "REDATOR") || "ADMIN",
+  };
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/admin/login" });
   };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col md:flex-row antialiased">
       {/* ------------------------------------------------------------- */}
-      {/* HEADER MOBILE (STICKY TOP 56px COM TOUCH TARGET OTIMIZADO) */}
+      {/* HEADER MOBILE (STICKY TOP 56px COM TOUCH TARGET OTIMIZADO)    */}
       {/* ------------------------------------------------------------- */}
       <header className="md:hidden sticky top-0 z-40 bg-neutral-900/95 backdrop-blur-md border-b border-neutral-800 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -93,19 +101,20 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           >
             <PlusCircle className="w-5 h-5" />
           </Link>
-          <Link
-            href="/"
-            target="_blank"
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-neutral-800 text-neutral-300 hover:text-white transition-colors"
-            title="Ver portal ao vivo"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-neutral-800 text-neutral-400 hover:text-red-400 transition-colors"
+            title="Sair da Conta"
+            aria-label="Sair da Conta"
           >
-            <ExternalLink className="w-4 h-4" />
-          </Link>
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </header>
 
       {/* ------------------------------------------------------------- */}
-      {/* SIDEBAR DESKTOP PERMANENTE (MODERNO DARK COM BORDAS SUTIS) */}
+      {/* SIDEBAR DESKTOP PERMANENTE (MODERNO DARK COM BORDAS SUTIS)     */}
       {/* ------------------------------------------------------------- */}
       <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-neutral-900 border-r border-neutral-800 shrink-0 select-none">
         {/* Brand Header */}
@@ -149,6 +158,11 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 ? pathname === "/admin"
                 : pathname?.startsWith(item.href);
 
+            // Filtragem visual por permissão de Admin
+            if (item.adminOnly && currentUser.role !== "ADMIN") {
+              return null;
+            }
+
             return (
               <Link
                 key={item.href}
@@ -180,15 +194,19 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        {/* Perfil do Usuário Logado */}
+        {/* Perfil do Usuário Logado + Botão Sair */}
         <div className="p-4 border-t border-neutral-800 bg-neutral-900/60">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="w-9 h-9 rounded-full bg-[#ff6305]/20 border border-[#ff6305]/30 flex items-center justify-center text-[#ff6305] font-bold text-sm shrink-0">
+            <Link
+              href="/admin/perfil"
+              className="flex items-center gap-3 overflow-hidden group flex-1 mr-2 p-1 rounded-lg hover:bg-neutral-800/60 transition-colors"
+              title="Acessar Configurações de Perfil"
+            >
+              <div className="w-9 h-9 rounded-full bg-[#ff6305]/20 border border-[#ff6305]/30 flex items-center justify-center text-[#ff6305] font-bold text-sm shrink-0 group-hover:scale-105 transition-transform">
                 {currentUser.name.charAt(0)}
               </div>
               <div className="truncate">
-                <p className="text-xs font-semibold text-white truncate">
+                <p className="text-xs font-semibold text-white truncate group-hover:text-[#ff6305] transition-colors">
                   {currentUser.name}
                 </p>
                 <div className="flex items-center gap-1 text-[10px] text-neutral-400">
@@ -202,12 +220,14 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                   </span>
                 </div>
               </div>
-            </div>
+            </Link>
 
             <button
               type="button"
-              className="p-2 text-neutral-400 hover:text-red-400 hover:bg-neutral-800 rounded-lg transition-colors"
-              title="Sair do Painel"
+              onClick={handleLogout}
+              className="p-2 text-neutral-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors shrink-0"
+              title="Sair da Conta (Logout)"
+              aria-label="Sair da Conta"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -216,7 +236,7 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* ------------------------------------------------------------- */}
-      {/* DRAWER SIDEBAR MOBILE (OFF-CANVAS COM FRAME MOTION) */}
+      {/* DRAWER SIDEBAR MOBILE (OFF-CANVAS COM FRAME MOTION)           */}
       {/* ------------------------------------------------------------- */}
       <AnimatePresence>
         {mobileSidebarOpen && (
@@ -278,6 +298,10 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                       ? pathname === "/admin"
                       : pathname?.startsWith(item.href);
 
+                  if (item.adminOnly && currentUser.role !== "ADMIN") {
+                    return null;
+                  }
+
                   return (
                     <Link
                       key={item.href}
@@ -310,22 +334,33 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
                 })}
               </nav>
 
-              {/* Perfil no Mobile */}
-              <div className="p-4 border-t border-neutral-800 bg-neutral-900/90 flex items-center justify-between">
-                <div className="truncate">
-                  <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
-                  <span className="text-[9px] uppercase font-bold text-[#ff6305]">
-                    {currentUser.role}
-                  </span>
+              {/* Perfil no Mobile + Botão Logout */}
+              <div className="p-4 border-t border-neutral-800 bg-neutral-900/90 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="truncate">
+                    <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
+                    <span className="text-[9px] uppercase font-bold text-[#ff6305]">
+                      {currentUser.role}
+                    </span>
+                  </div>
+                  <Link
+                    href="/"
+                    target="_blank"
+                    className="px-3 py-1.5 rounded-lg bg-neutral-800 text-[11px] text-neutral-300 font-medium flex items-center gap-1 hover:text-white"
+                  >
+                    <span>Portal</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
                 </div>
-                <Link
-                  href="/"
-                  target="_blank"
-                  className="px-3 py-1.5 rounded-lg bg-neutral-800 text-[11px] text-neutral-300 font-medium flex items-center gap-1"
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 transition-colors"
                 >
-                  <span>Portal</span>
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
+                  <LogOut className="w-4 h-4" />
+                  <span>Sair da Conta</span>
+                </button>
               </div>
             </motion.aside>
           </div>
@@ -333,7 +368,7 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* ------------------------------------------------------------- */}
-      {/* ÁREA DE CONTEÚDO PRINCIPAL DO PAINEL */}
+      {/* ÁREA DE CONTEÚDO PRINCIPAL DO PAINEL                          */}
       {/* ------------------------------------------------------------- */}
       <div className="flex-1 flex flex-col min-w-0 bg-neutral-950">
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
@@ -343,3 +378,5 @@ export function AdminLayoutShell({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+export default AdminLayoutShell;

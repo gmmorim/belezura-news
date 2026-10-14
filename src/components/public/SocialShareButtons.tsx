@@ -17,8 +17,8 @@ export interface ShareButtonsProps {
   className?: string;
 }
 
-// Ícones SVG Vetoriais Inline Otimizados para Redes Específicas
-function ThreadsIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+// Ícones Vetoriais SVG Inline Otimizados para Redes Específicas
+function ThreadsIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 192 192"
@@ -31,7 +31,7 @@ function ThreadsIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   );
 }
 
-function XIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+function XIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -44,7 +44,7 @@ function XIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   );
 }
 
-function TelegramIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
+function TelegramIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -63,15 +63,12 @@ export function SocialShareButtons({
   subtitle,
   className = "",
 }: ShareButtonsProps) {
-  // Estado para armazenar a URL dinâmica (evita localhost e estáticos de SSR)
   const [shareUrl, setShareUrl] = useState<string>("");
   const [canNativeShare, setCanNativeShare] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Regra anti-localhost: Se a URL da prop for nula ou contiver localhost
-      // enquanto o navegador estiver em produção/outro domínio, usa window.location.href
       const hasLocalhostProp =
         url && (url.includes("localhost") || url.includes("127.0.0.1"));
       const isWindowNotLocalhost =
@@ -84,7 +81,6 @@ export function SocialShareButtons({
         setShareUrl(url);
       }
 
-      // Detecção dinâmica de suporte à Web Share API (Mobile / iOS / Android)
       if (
         typeof navigator !== "undefined" &&
         typeof navigator.share === "function"
@@ -94,7 +90,6 @@ export function SocialShareButtons({
     }
   }, [url]);
 
-  // Função auxiliar para recuperar a URL no momento exato da interação
   const getDynamicUrl = () => {
     if (typeof window !== "undefined") {
       const hasLocalhostProp =
@@ -111,7 +106,6 @@ export function SocialShareButtons({
     return shareUrl || url || "";
   };
 
-  // 1. Ação de Compartilhamento Nativo (Web Share API para Instagram Stories, SMS, etc.)
   const handleNativeShare = async () => {
     const finalUrl = getDynamicUrl();
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -122,7 +116,6 @@ export function SocialShareButtons({
           url: finalUrl,
         });
       } catch (err: unknown) {
-        // Ignora silenciosamente caso o leitor tenha apenas fechado a gaveta (AbortError)
         if ((err as Error)?.name !== "AbortError") {
           console.warn("Erro ao acionar compartilhamento nativo:", err);
         }
@@ -130,7 +123,6 @@ export function SocialShareButtons({
     }
   };
 
-  // 2. Ação de Copiar Link com Fallback Seguro
   const handleCopy = async () => {
     try {
       const finalUrl = getDynamicUrl();
@@ -153,33 +145,28 @@ export function SocialShareButtons({
     }
   };
 
-  const activeUrl = shareUrl || (typeof window !== "undefined" ? window.location.href : (url || ""));
+  const activeUrl =
+    shareUrl || (typeof window !== "undefined" ? window.location.href : url || "");
   const encodedTitle = encodeURIComponent(title);
   const encodedUrl = encodeURIComponent(activeUrl);
   const encodedTextWithUrl = encodeURIComponent(`${title} ${activeUrl}`);
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 sm:gap-2 ${className}`}
+      className={`flex items-center gap-1.5 sm:gap-2 flex-wrap ${className}`}
       role="region"
       aria-label="Compartilhar matéria"
     >
-      <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 mr-1 flex items-center gap-1.5 shrink-0 select-none">
-        <Share2 className="w-3.5 h-3.5 text-neutral-400" aria-hidden="true" />
-        <span>Compartilhar:</span>
-      </span>
-
-      {/* 1. Botão Nativo (Web Share API - iOS / Android / Instagram / SMS) */}
+      {/* 1. Botão Nativo (Web Share API - iOS / Android: Instagram Stories, SMS, Apps) */}
       {canNativeShare && (
         <button
           type="button"
           onClick={handleNativeShare}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#ff6305]/10 text-[#ff6305] hover:bg-[#ff6305] hover:text-white border border-[#ff6305]/30 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
-          title="Abrir opções de compartilhamento do seu aparelho (Instagram Stories, SMS, Apps)"
+          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-[#ff6305]/10 text-[#ff6305] hover:bg-[#ff6305] hover:text-white border border-[#ff6305]/30 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+          title="Partilhar no seu aparelho (Instagram Stories, SMS, Apps)"
           aria-label="Partilhar usando aplicativos do sistema"
         >
-          <Share2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-          <span>Partilhar...</span>
+          <Share2 className="w-4 h-4 shrink-0" aria-hidden="true" />
         </button>
       )}
 
@@ -188,12 +175,11 @@ export function SocialShareButtons({
         href={`https://api.whatsapp.com/send?text=${encodedTextWithUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200/60 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200/70 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no WhatsApp"
         aria-label="Compartilhar no WhatsApp"
       >
-        <MessageCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-        <span className="hidden xs:inline">WhatsApp</span>
+        <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
       </a>
 
       {/* 3. Threads */}
@@ -201,12 +187,11 @@ export function SocialShareButtons({
         href={`https://threads.net/intent/post?text=${encodedTextWithUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-800 hover:bg-black hover:text-white border border-neutral-200 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-neutral-100 text-neutral-800 hover:bg-black hover:text-white border border-neutral-200 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no Threads"
         aria-label="Compartilhar no Threads"
       >
-        <ThreadsIcon className="w-3.5 h-3.5 shrink-0" />
-        <span className="hidden xs:inline">Threads</span>
+        <ThreadsIcon className="w-4 h-4 shrink-0" />
       </a>
 
       {/* 4. Twitter / X */}
@@ -214,12 +199,11 @@ export function SocialShareButtons({
         href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100 text-neutral-800 hover:bg-neutral-900 hover:text-white border border-neutral-200 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-neutral-100 text-neutral-800 hover:bg-neutral-900 hover:text-white border border-neutral-200 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no X (Twitter)"
         aria-label="Compartilhar no X (Twitter)"
       >
-        <XIcon className="w-3.5 h-3.5 shrink-0" />
-        <span className="hidden xs:inline">X</span>
+        <XIcon className="w-4 h-4 shrink-0" />
       </a>
 
       {/* 5. LinkedIn */}
@@ -227,12 +211,11 @@ export function SocialShareButtons({
         href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 text-sky-700 hover:bg-[#0077b5] hover:text-white border border-sky-200/60 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-sky-50 text-sky-700 hover:bg-[#0077b5] hover:text-white border border-sky-200/70 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no LinkedIn"
         aria-label="Compartilhar no LinkedIn"
       >
-        <Linkedin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-        <span className="hidden xs:inline">LinkedIn</span>
+        <Linkedin className="w-4 h-4 shrink-0" aria-hidden="true" />
       </a>
 
       {/* 6. Telegram */}
@@ -240,12 +223,11 @@ export function SocialShareButtons({
         href={`https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-50 text-sky-600 hover:bg-[#229ED9] hover:text-white border border-sky-200/60 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-sky-50 text-sky-600 hover:bg-[#229ED9] hover:text-white border border-sky-200/70 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no Telegram"
         aria-label="Compartilhar no Telegram"
       >
-        <TelegramIcon className="w-3.5 h-3.5 shrink-0" />
-        <span className="hidden xs:inline">Telegram</span>
+        <TelegramIcon className="w-4 h-4 shrink-0" />
       </a>
 
       {/* 7. Facebook */}
@@ -253,36 +235,29 @@ export function SocialShareButtons({
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 hover:bg-[#1877f2] hover:text-white border border-blue-200/60 text-xs font-semibold transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0"
+        className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 bg-blue-50 text-blue-700 hover:bg-[#1877f2] hover:text-white border border-blue-200/70 transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
         title="Compartilhar no Facebook"
         aria-label="Compartilhar no Facebook"
       >
-        <Facebook className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-        <span className="hidden xs:inline">Facebook</span>
+        <Facebook className="w-4 h-4 shrink-0" aria-hidden="true" />
       </a>
 
       {/* 8. Copiar Link */}
       <button
         type="button"
         onClick={handleCopy}
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 ${
+        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 border transition-all duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 shadow-sm ${
           copied
-            ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-            : "bg-white text-neutral-700 hover:border-[#ff6305] hover:text-[#ff6305] border-neutral-200 shadow-sm"
+            ? "bg-emerald-500 text-white border-emerald-500"
+            : "bg-white text-neutral-700 hover:border-[#ff6305] hover:text-[#ff6305] border-neutral-200"
         }`}
-        title="Copiar link da matéria para a área de transferência"
-        aria-label="Copiar link da matéria"
+        title={copied ? "Link copiado com sucesso!" : "Copiar link da matéria"}
+        aria-label={copied ? "Link copiado" : "Copiar link"}
       >
         {copied ? (
-          <>
-            <Check className="w-3.5 h-3.5 shrink-0 text-white" aria-hidden="true" />
-            <span>Copiado!</span>
-          </>
+          <Check className="w-4 h-4 text-white" aria-hidden="true" />
         ) : (
-          <>
-            <Link2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-            <span>Copiar Link</span>
-          </>
+          <Link2 className="w-4 h-4" aria-hidden="true" />
         )}
       </button>
     </div>

@@ -333,7 +333,7 @@ export default async function PostDetailPage({
 
         {/* Linha Editorial do Autor, Data e Compartilhamento */}
         <div className="pt-4 pb-2 border-y border-neutral-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <div className="w-10 h-10 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-sm shrink-0">
               {post.author.charAt(0)}
             </div>
@@ -347,7 +347,7 @@ export default async function PostDetailPage({
             </div>
           </div>
 
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center">
             <SocialShareButtons title={post.title} url={postUrl} />
           </div>
         </div>

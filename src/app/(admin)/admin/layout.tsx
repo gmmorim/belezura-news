@@ -1,5 +1,6 @@
 import React from "react";
 import { AdminLayoutShell } from "@/components/admin/AdminSidebar";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 export const metadata = {
   title: "Painel Editorial | Belezura News CMS",
@@ -11,5 +12,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminLayoutShell>{children}</AdminLayoutShell>;
+  return (
+    <AuthProvider>
+      <AdminLayoutShell>{children}</AdminLayoutShell>
+    </AuthProvider>
+  );
 }
