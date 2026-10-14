@@ -238,6 +238,13 @@ export default async function HomePage() {
                       {post.title}
                     </Link>
                   </h2>
+
+                  {/* 4. Subtítulo / Linha Fina (Preenche o espaço com line-clamp para controle rigoroso de altura) */}
+                  {post.subtitle && (
+                    <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 font-light leading-relaxed">
+                      {post.subtitle}
+                    </p>
+                  )}
                 </article>
               ))
             ) : (
