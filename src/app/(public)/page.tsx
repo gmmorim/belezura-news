@@ -431,7 +431,7 @@ export default async function HomePage() {
           {/* Botão Grande e Centralizado: Ver Mais Matérias */}
           <div className="mt-12 sm:mt-16 flex justify-center w-full">
             <Link
-              href="/beauty"
+              href="/feed"
               className="font-alleron inline-flex items-center justify-center gap-2.5 px-10 sm:px-14 py-4 sm:py-4.5 bg-[#ff6305] text-white text-sm sm:text-base font-bold uppercase tracking-widest rounded-none hover:bg-orange-600 active:scale-[0.99] transition-all shadow-md shadow-orange-500/20"
             >
               <span>Ver mais matérias</span>
