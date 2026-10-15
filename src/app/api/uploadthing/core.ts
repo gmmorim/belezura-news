@@ -5,7 +5,19 @@ const f = createUploadthing();
 export const ourFileRouter = {
   postImageUploader: f({
     image: {
-      maxFileSize: "8MB",
+      maxFileSize: "1GB",
+      maxFileCount: 1,
+    },
+    "image/jpeg": {
+      maxFileSize: "1GB",
+      maxFileCount: 1,
+    },
+    "image/png": {
+      maxFileSize: "1GB",
+      maxFileCount: 1,
+    },
+    "image/webp": {
+      maxFileSize: "1GB",
       maxFileCount: 1,
     },
   })

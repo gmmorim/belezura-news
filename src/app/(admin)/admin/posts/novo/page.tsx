@@ -1,10 +1,34 @@
-"use client";
-
 import React, { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import { PostForm } from "@/components/admin/PostForm";
+import { prisma } from "@/lib/prisma";
 
-export default function NewPostPage() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function NewPostPage() {
+  let categories: { id: string; name: string; slug: string }[] = [];
+  let authors: { id: string; name: string; email: string }[] = [];
+
+  try {
+    const [cats, users] = await Promise.all([
+      prisma.category.findMany({
+        where: { isActive: true },
+        orderBy: { order: "asc" },
+        select: { id: true, name: true, slug: true },
+      }),
+      prisma.user.findMany({
+        where: { isActive: true },
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, email: true },
+      }),
+    ]);
+    categories = cats;
+    authors = users;
+  } catch (error) {
+    console.error("[NEW_POST_PAGE_PREFETCH_ERROR]", error);
+  }
+
   return (
     <Suspense
       fallback={
@@ -16,7 +40,7 @@ export default function NewPostPage() {
         </div>
       }
     >
-      <PostForm />
+      <PostForm initialCategories={categories} initialAuthors={authors} />
     </Suspense>
   );
 }

@@ -13,6 +13,7 @@ import { ViewTracker } from "@/components/analytics/ViewTracker";
 import { SocialShareButtons } from "@/components/public/SocialShareButtons";
 import { InlineNewsletterBox } from "@/components/public/InlineNewsletterBox";
 import { prisma } from "@/lib/prisma";
+import { stripHtml } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -170,7 +171,7 @@ async function getPost(slug: string): Promise<PostData | null> {
         imageMobile: dbPost.imageMobile || dbPost.imageWeb,
         imageSourceText: dbPost.imageSourceText || "Reprodução / Arquivo",
         imageSourceUrl: dbPost.imageSourceUrl || "",
-        content: dbPost.content.includes("<p>")
+        content: dbPost.content.includes("<")
           ? [dbPost.content]
           : dbPost.content.split("\n\n").filter(Boolean),
         tags: dbPost.tags?.map((t: { name: string }) => t.name) || [],
@@ -331,7 +332,7 @@ export default async function PostDetailPage({
         {/* Subtítulo */}
         {post.subtitle && (
           <p className="text-base sm:text-lg lg:text-xl text-neutral-600 font-light leading-relaxed">
-            {post.subtitle}
+            {stripHtml(post.subtitle)}
           </p>
         )}
 
@@ -396,7 +397,7 @@ export default async function PostDetailPage({
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10">
         <div className="prose prose-neutral sm:prose-lg max-w-none text-neutral-800 leading-relaxed sm:leading-loose space-y-6 sm:space-y-8 font-normal">
           {post.content.map((paragraph, index) => {
-            if (paragraph.includes("<p>") || paragraph.includes("<div>")) {
+            if (paragraph.includes("<") && paragraph.includes(">")) {
               return (
                 <div
                   key={index}
@@ -533,7 +534,7 @@ export default async function PostDetailPage({
               {/* Subtítulo */}
               {item.subtitle && (
                 <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 font-light">
-                  {item.subtitle}
+                  {stripHtml(item.subtitle)}
                 </p>
               )}
 

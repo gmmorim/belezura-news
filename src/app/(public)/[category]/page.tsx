@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock, ArrowUpRight, Sparkles, ExternalLink } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { stripHtml } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -40,10 +41,10 @@ const CATEGORY_MAP: Record<string, CategoryMeta> = {
     tagline: "Testes laboratoriais e opiniões sem filtro sobre os lançamentos mais comentados.",
     badge: "Bancada de Testes",
   },
-  radar: {
-    title: "Radar Belezura News",
-    tagline: "A esteira em tempo real das pautas mais quentes da internet curadas pela nossa redação.",
-    badge: "Trending Feed",
+  entrevistas: {
+    title: "BLZURA Entrevistas",
+    tagline: "Grandes conversas e bastidores com mentes inovadoras, criadores e executivos da beleza e da moda.",
+    badge: "Grandes Conversas",
   },
 };
 
@@ -78,13 +79,9 @@ export default async function CategoryFeedPage({
   const posts = await prisma.post.findMany({
     where: {
       status: "PUBLISHED",
-      ...(catKey !== "radar"
-        ? {
-            category: {
-              slug: catKey,
-            },
-          }
-        : {}),
+      category: {
+        slug: catKey,
+      },
     },
     orderBy: { createdAt: "desc" },
     include: {
@@ -163,7 +160,7 @@ export default async function CategoryFeedPage({
                 {/* Subtítulo */}
                 {post.subtitle && (
                   <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed font-light">
-                    {post.subtitle}
+                    {stripHtml(post.subtitle)}
                   </p>
                 )}
 

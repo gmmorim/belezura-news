@@ -22,6 +22,7 @@ export interface PostFormData {
   subtitle: string;
   category: string;
   author: string;
+  authorId?: string;
   date: string;
   imageWeb: string;
   imageMobile: string;
@@ -31,6 +32,7 @@ export interface PostFormData {
   tags: string[];
   status: "DRAFT" | "PUBLISHED";
 }
+
 
 interface LivePreviewModalProps {
   isOpen: boolean;
@@ -252,9 +254,13 @@ export function LivePreviewModal({
               {/* Corpo da Matéria formatado */}
               <div className="prose prose-neutral max-w-none text-neutral-800 text-sm sm:text-base leading-relaxed space-y-4">
                 {data.content ? (
-                  data.content.split("\n\n").map((paragrafo, idx) => (
-                    <p key={idx}>{paragrafo}</p>
-                  ))
+                  data.content.includes("<") ? (
+                    <div dangerouslySetInnerHTML={{ __html: data.content }} />
+                  ) : (
+                    data.content.split("\n\n").map((paragrafo, idx) => (
+                      <p key={idx}>{paragrafo}</p>
+                    ))
+                  )
                 ) : (
                   <p className="text-neutral-400 italic">
                     O corpo do seu texto aparecerá aqui conforme você escreve no editor...

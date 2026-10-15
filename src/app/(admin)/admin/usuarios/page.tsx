@@ -232,7 +232,7 @@ export default function AdminUsuariosPage() {
             </h3>
           </div>
           <p className="text-xs text-neutral-400 leading-relaxed">
-            Focado na esteira de conteúdo. Acesso ao Radar Google News, criação e edição de postagens e uso do simulador de Live Preview.
+            Focado na esteira de conteúdo. Criação e edição de postagens e uso do simulador de Live Preview.
           </p>
         </div>
       </div>

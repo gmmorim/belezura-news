@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { Sparkles, ArrowUpRight, Clock, ExternalLink } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { stripHtml } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -120,7 +121,7 @@ export default async function FeedPage() {
                 {/* 4. Subtítulo / Linha Fina com line-clamp */}
                 {post.subtitle && (
                   <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 leading-relaxed font-light">
-                    {post.subtitle}
+                    {stripHtml(post.subtitle)}
                   </p>
                 )}
 

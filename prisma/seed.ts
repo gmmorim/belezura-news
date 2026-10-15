@@ -137,6 +137,12 @@ async function main() {
       description: "Testes sinceros de produtos, bancada de análises e lançamentos.",
       order: 5,
     },
+    {
+      name: "Entrevistas",
+      slug: "entrevistas",
+      description: "Grandes conversas, perfis exclusivos e bastidores do mercado de beleza.",
+      order: 6,
+    },
   ];
 
   const categoryMap: Record<string, string> = {};

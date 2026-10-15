@@ -45,6 +45,7 @@ export async function verifyPassword(
  */
 const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   allowedTags: [
+    "h1",
     "h2",
     "h3",
     "h4",
@@ -71,10 +72,10 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
     img: ["src", "alt", "title", "width", "height", "loading"],
     "*": ["class"], // Permite estilização controlada
   },
-  // Bloqueio rigoroso de esquemas como javascript:, data:, vbscript:
+  // Bloqueio rigoroso de esquemas como javascript:, vbscript:
   allowedSchemes: ["http", "https", "mailto"],
   allowedSchemesByTag: {
-    img: ["http", "https"],
+    img: ["http", "https", "data"],
   },
   // Força atributos seguros em todos os links externos
   transformTags: {
@@ -142,7 +143,7 @@ export const PostSubmissionSchema = z.object({
     .string()
     .min(5, "O título deve ter no mínimo 5 caracteres")
     .max(200, "O título deve ter no máximo 200 caracteres"),
-  subtitle: z.string().max(350, "O subtítulo deve ter no máximo 350 caracteres").optional().or(z.literal("")).or(z.null()),
+  subtitle: z.string().max(500, "O subtítulo deve ter no máximo 500 caracteres").optional().or(z.literal("")).or(z.null()),
   category: z
     .string()
     .min(2, "A categoria deve ter no mínimo 2 caracteres")
@@ -153,6 +154,7 @@ export const PostSubmissionSchema = z.object({
     .max(100)
     .optional()
     .or(z.literal("")),
+  authorId: z.string().optional().or(z.literal("")).or(z.null()),
   date: z.string().optional().or(z.literal("")),
   imageWeb: z
     .string()

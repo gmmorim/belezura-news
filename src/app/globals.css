@@ -65,3 +65,25 @@
     scrollbar-width: none;
   }
 }
+
+/* Customizações editoriais para o corpo de matérias e editor TipTap */
+.prose img {
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.prose blockquote {
+  border-left-width: 4px;
+  border-left-color: #ff6305;
+  padding-left: 1.25rem;
+  font-style: italic;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+

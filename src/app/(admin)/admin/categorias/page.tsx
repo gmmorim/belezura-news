@@ -28,7 +28,7 @@ const INITIAL_CATEGORIES: CategoryAdminItem[] = [
   { id: "3", name: "Business", slug: "business", order: 3, isActive: true, postsCount: 29 },
   { id: "4", name: "Lifestyle", slug: "lifestyle", order: 4, isActive: true, postsCount: 24 },
   { id: "5", name: "Reviews", slug: "reviews", order: 5, isActive: true, postsCount: 15 },
-  { id: "6", name: "Radar News", slug: "radar", order: 6, isActive: true, postsCount: 50 },
+  { id: "6", name: "Entrevistas", slug: "entrevistas", order: 6, isActive: true, postsCount: 0 },
 ];
 
 export default function AdminCategoriasPage() {

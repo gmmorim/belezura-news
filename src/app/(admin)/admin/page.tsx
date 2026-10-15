@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   TrendingUp,
   Eye,
-  Radio,
   PlusCircle,
   ArrowUpRight,
   Sparkles,
@@ -145,14 +144,6 @@ export default function AdminDashboardPage() {
               Este Mês
             </button>
           </div>
-
-          <Link
-            href="/admin/radar"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 text-xs font-semibold transition-colors"
-          >
-            <Radio className="w-3.5 h-3.5 text-[#ff6305]" />
-            <span className="hidden xs:inline">Radar</span>
-          </Link>
 
           <Link
             href="/admin/posts/novo"

@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export const metadata = {
   title: "Painel Editorial | Belezura News CMS",
-  description: "Sistema de gerenciamento de conteúdo e radar de notícias do Belezura News.",
+  description: "Sistema de gerenciamento de conteúdo do Belezura News.",
 };
 
 export default function AdminLayout({

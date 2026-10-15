@@ -128,12 +128,28 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 5. Resolução do Autor (Vincula ao usuário logado ou primeiro ativo)
-    let author = await prisma.user.findFirst({
-      where: {
-        OR: [{ id: user.id }, { email: user.email }],
-      },
-    });
+    // 5. Resolução do Autor (authorId explícito, nome ou usuário logado)
+    let author = null;
+
+    if (validData.authorId) {
+      author = await prisma.user.findUnique({
+        where: { id: validData.authorId },
+      });
+    }
+
+    if (!author && validData.author) {
+      author = await prisma.user.findFirst({
+        where: { name: validData.author },
+      });
+    }
+
+    if (!author) {
+      author = await prisma.user.findFirst({
+        where: {
+          OR: [{ id: user.id }, { email: user.email }],
+        },
+      });
+    }
 
     if (!author) {
       author = await prisma.user.findFirst({ where: { isActive: true } });

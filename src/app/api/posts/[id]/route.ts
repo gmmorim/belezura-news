@@ -51,6 +51,7 @@ export async function GET(
         subtitle: post.subtitle || "",
         category: post.category?.name || "Beauty",
         author: post.author?.name || "Redação Belezura",
+        authorId: post.authorId || post.author?.id || "",
         date: post.publishedAt
           ? post.publishedAt.toISOString().slice(0, 16)
           : post.createdAt.toISOString().slice(0, 16),
@@ -135,6 +136,24 @@ export async function PUT(
       );
     }
 
+    // Resolução do autor (se especificado)
+    let authorId = existingPost.authorId;
+    if (validData.authorId) {
+      const authorExists = await prisma.user.findUnique({
+        where: { id: validData.authorId },
+      });
+      if (authorExists) {
+        authorId = authorExists.id;
+      }
+    } else if (validData.author) {
+      const authorExists = await prisma.user.findFirst({
+        where: { name: validData.author },
+      });
+      if (authorExists) {
+        authorId = authorExists.id;
+      }
+    }
+
     // Sanitização de HTML com suporte a rich-text / TipTap
     const sanitizedHtmlContent = sanitizePostContent(validData.content);
 
@@ -152,6 +171,7 @@ export async function PUT(
         imageSourceUrl: validData.imageSourceUrl || null,
         status: validData.status,
         categoryId: category.id,
+        authorId,
         publishedAt:
           validData.status === "PUBLISHED" && !existingPost.publishedAt
             ? new Date()

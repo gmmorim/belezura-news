@@ -2,10 +2,9 @@ import React from "react";
 import Link from "next/link";
 import { ArrowUpRight, Sparkles, Clock, Bookmark, MessageSquareQuote } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { stripHtml } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-export const fetchCache = "force-no-store";
+export const revalidate = 60;
 
 // ============================================================================
 // HELPERS DE FORMATAÇÃO EDITORIAL
@@ -69,38 +68,23 @@ export default async function HomePage() {
   const heroPost = topPosts[0];
   const sideHeroPosts = topPosts.slice(1, 3);
 
-  // 2. Seção "BLZURA Entrevistas": Matérias de entrevistas / grandes reportagens
-  let interviewPosts = await prisma.post.findMany({
+  // 2. Seção "BLZURA Entrevistas": Matérias filtradas estritamente pela editoria ENTREVISTAS
+  const interviewPosts = await prisma.post.findMany({
     where: {
       status: "PUBLISHED",
       OR: [
-        { category: { slug: "entrevistas" } },
-        { category: { slug: "business" } },
-        { category: { slug: "lifestyle" } },
-        { title: { contains: "entrevista" } },
-        { subtitle: { contains: "entrevista" } },
+        { category: { name: { equals: "ENTREVISTAS" } } },
+        { category: { name: { equals: "Entrevistas" } } },
+        { category: { slug: { equals: "entrevistas" } } },
       ],
     },
-    orderBy: { views: "desc" },
+    orderBy: { createdAt: "desc" },
     take: 3,
     include: {
       category: true,
       author: true,
     },
   });
-
-  // Fallback caso não haja matérias com essas tags/categorias específicas
-  if (interviewPosts.length === 0) {
-    interviewPosts = await prisma.post.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { views: "desc" },
-      take: 3,
-      include: {
-        category: true,
-        author: true,
-      },
-    });
-  }
 
   // 3. Seção "BLZURA News": Últimas Pautas & Tendências (6 matérias para grid 2x3 no desktop)
   const blzuraNewsPosts = await prisma.post.findMany({
@@ -192,7 +176,7 @@ export default async function HomePage() {
             {/* Subtítulo / Linha Fina */}
             {heroPost.subtitle && (
               <p className="mt-3 text-sm sm:text-base text-neutral-600 line-clamp-3 font-light leading-relaxed">
-                {heroPost.subtitle}
+                {stripHtml(heroPost.subtitle)}
               </p>
             )}
 
@@ -244,7 +228,7 @@ export default async function HomePage() {
                   {/* 4. Subtítulo / Linha Fina (Preenche o espaço com line-clamp para controle rigoroso de altura) */}
                   {post.subtitle && (
                     <p className="mt-2 text-xs sm:text-sm text-neutral-600 line-clamp-2 font-light leading-relaxed">
-                      {post.subtitle}
+                      {stripHtml(post.subtitle)}
                     </p>
                   )}
                 </article>
@@ -282,61 +266,69 @@ export default async function HomePage() {
           </div>
 
           {/* Grid de Entrevistas no Padrão Editorial Empilhado */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            {interviewPosts.map((interview) => (
-              <article
-                key={interview.id}
-                className="w-full group flex flex-col items-start text-left bg-neutral-900/60 p-5 border border-neutral-800 rounded-none hover:border-[#ff6305]/60 transition-all duration-300"
-              >
-                {/* 1. Imagem no Topo limpa */}
-                <Link
-                  href={`/post/${interview.slug}`}
-                  className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-950 rounded-none border border-neutral-800"
+          {interviewPosts.length === 0 ? (
+            <div className="p-12 text-center border border-dashed border-neutral-800 rounded-none max-w-lg mx-auto">
+              <p className="text-sm text-neutral-400 font-light">
+                Novas entrevistas e diálogos exclusivos com líderes e criadores estão a ser preparados para esta seção.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+              {interviewPosts.map((interview) => (
+                <article
+                  key={interview.id}
+                  className="w-full group flex flex-col items-start text-left bg-neutral-900/60 p-5 border border-neutral-800 rounded-none hover:border-[#ff6305]/60 transition-all duration-300"
                 >
-                  <img
-                    src={interview.imageWeb}
-                    alt={interview.title}
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-                </Link>
-
-                {/* Crédito */}
-                <div className="mt-1.5 text-[10px] text-neutral-500 flex items-center gap-1">
-                  <span>Fonte:</span>
-                  <span className="text-neutral-400 truncate">{interview.imageSourceText || "Editorial"}</span>
-                </div>
-
-                {/* 2. Categoria em Destaque */}
-                <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
-                  {interview.category?.name || "Entrevista"}
-                </span>
-
-                {/* 3. Título / Manchete */}
-                <h3 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-white group-hover:text-[#ff6305] transition-colors leading-snug">
-                  <Link href={`/post/${interview.slug}`}>
-                    {interview.title}
-                  </Link>
-                </h3>
-
-                {interview.subtitle && (
-                  <p className="mt-2 text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-light">
-                    {interview.subtitle}
-                  </p>
-                )}
-
-                <div className="pt-3 mt-4 border-t border-neutral-800 flex items-center justify-between w-full text-[11px] text-neutral-400">
+                  {/* 1. Imagem no Topo limpa */}
                   <Link
                     href={`/post/${interview.slug}`}
-                    className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                    className="block relative aspect-[16/10] w-full overflow-hidden bg-neutral-950 rounded-none border border-neutral-800"
                   >
-                    <span>Ler entrevista</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <img
+                      src={interview.imageWeb}
+                      alt={interview.title}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
                   </Link>
-                  <span>{formatDate(interview.createdAt)}</span>
-                </div>
-              </article>
-            ))}
-          </div>
+
+                  {/* Crédito */}
+                  <div className="mt-1.5 text-[10px] text-neutral-500 flex items-center gap-1">
+                    <span>Fonte:</span>
+                    <span className="text-neutral-400 truncate">{interview.imageSourceText || "Editorial"}</span>
+                  </div>
+
+                  {/* 2. Categoria em Destaque */}
+                  <span className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] block mt-3">
+                    {interview.category?.name || "Entrevista"}
+                  </span>
+
+                  {/* 3. Título / Manchete */}
+                  <h3 className="mt-1.5 font-recoleta text-lg sm:text-xl font-normal text-white group-hover:text-[#ff6305] transition-colors leading-snug">
+                    <Link href={`/post/${interview.slug}`}>
+                      {interview.title}
+                    </Link>
+                  </h3>
+
+                  {interview.subtitle && (
+                    <p className="mt-2 text-xs sm:text-sm text-neutral-400 line-clamp-2 leading-relaxed font-light">
+                      {stripHtml(interview.subtitle)}
+                    </p>
+                  )}
+
+                  <div className="pt-3 mt-4 border-t border-neutral-800 flex items-center justify-between w-full text-[11px] text-neutral-400">
+                    <Link
+                      href={`/post/${interview.slug}`}
+                      className="font-alleron text-xs font-bold uppercase tracking-wider text-[#ff6305] flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                    >
+                      <span>Ler entrevista</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <span>{formatDate(interview.createdAt)}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

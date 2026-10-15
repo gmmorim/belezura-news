@@ -8,35 +8,65 @@ import {
   Eye,
   CheckCircle2,
   FileCheck,
-  ImageIcon,
-  Sparkles,
-  Tag as TagIcon,
   Smartphone,
   Globe,
-  Radio,
   X,
   Plus,
   AlertCircle,
   Loader2,
   Trash2,
+  User,
 } from "lucide-react";
 import { LivePreviewModal, PostFormData } from "@/components/admin/LivePreviewModal";
 import { TiptapEditor } from "@/components/admin/TiptapEditor";
 import { UploadDropzone } from "@/lib/uploadthing";
 
-const CATEGORIES = ["Beauty", "Business", "Fashion", "Lifestyle", "Reviews"];
+export interface PostCategoryOption {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-export function PostForm() {
+export interface PostAuthorOption {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface PostFormProps {
+  initialCategories?: PostCategoryOption[];
+  initialAuthors?: PostAuthorOption[];
+}
+
+const DEFAULT_CATEGORIES: PostCategoryOption[] = [
+  { id: "1", name: "Beauty", slug: "beauty" },
+  { id: "2", name: "Fashion", slug: "fashion" },
+  { id: "3", name: "Business", slug: "business" },
+  { id: "4", name: "Lifestyle", slug: "lifestyle" },
+  { id: "5", name: "Reviews", slug: "reviews" },
+  { id: "6", name: "Entrevistas", slug: "entrevistas" },
+];
+
+export function PostForm({
+  initialCategories = [],
+  initialAuthors = [],
+}: PostFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get("edit");
+
+  const [categories, setCategories] = useState<PostCategoryOption[]>(
+    initialCategories.length > 0 ? initialCategories : DEFAULT_CATEGORIES
+  );
+  const [authors, setAuthors] = useState<PostAuthorOption[]>(initialAuthors);
 
   // Estados do Formulário
   const [formData, setFormData] = useState<PostFormData>({
     title: "",
     subtitle: "",
-    category: "Beauty",
-    author: "Redação Belezura",
+    category: initialCategories[0]?.name || "Beauty",
+    author: initialAuthors[0]?.name || "Redação Belezura",
+    authorId: initialAuthors[0]?.id || "",
     date: new Date().toISOString().slice(0, 16),
     imageWeb: "",
     imageMobile: "",
@@ -49,7 +79,6 @@ export function PostForm() {
 
   const [tagInput, setTagInput] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [radarNotice, setRadarNotice] = useState<string | null>(null);
 
   // Estados de Carregamento e Edição
   const [loadingEditData, setLoadingEditData] = useState(false);
@@ -58,7 +87,25 @@ export function PostForm() {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // 1. CARREGAMENTO DOS DADOS PARA EDIÇÃO (Resolve o bug de campos vazios)
+  // Busca categorias se não vieram do servidor
+  useEffect(() => {
+    if (initialCategories.length === 0) {
+      fetch("/api/categories")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.categories) && data.categories.length > 0) {
+            setCategories(data.categories);
+            setFormData((prev) => ({
+              ...prev,
+              category: prev.category || data.categories[0].name,
+            }));
+          }
+        })
+        .catch((err) => console.warn("Aviso ao carregar categorias dinâmicas:", err));
+    }
+  }, [initialCategories]);
+
+  // 1. CARREGAMENTO DOS DADOS PARA EDIÇÃO (Resolve o bug de campos vazios e autorId)
   useEffect(() => {
     if (!editId) return;
 
@@ -80,6 +127,7 @@ export function PostForm() {
             subtitle: data.post.subtitle || "",
             category: data.post.category || "Beauty",
             author: data.post.author || "Redação Belezura",
+            authorId: data.post.authorId || "",
             date: data.post.date || new Date().toISOString().slice(0, 16),
             imageWeb: data.post.imageWeb || "",
             imageMobile: data.post.imageMobile || "",
@@ -107,29 +155,6 @@ export function PostForm() {
       isMounted = false;
     };
   }, [editId]);
-
-  // 2. Preenchimento via Radar Google News (Novo Post)
-  useEffect(() => {
-    if (editId) return;
-
-    const radarTitle = searchParams.get("title");
-    const radarCategory = searchParams.get("category");
-    const radarSourceUrl = searchParams.get("sourceUrl");
-    const radarSourceName = searchParams.get("sourceName");
-
-    if (radarTitle) {
-      setFormData((prev) => ({
-        ...prev,
-        title: radarTitle,
-        category: radarCategory || prev.category,
-        imageSourceText: radarSourceName ? `Referência: ${radarSourceName}` : prev.imageSourceText,
-        imageSourceUrl: radarSourceUrl || prev.imageSourceUrl,
-      }));
-      setRadarNotice(
-        `Pauta importada do Radar Google News (${radarSourceName || "Veículo externo"}). Formate o conteúdo no tom editorial do Belezura News.`
-      );
-    }
-  }, [searchParams, editId]);
 
   // Manipulação de Tags
   const handleAddTag = () => {
@@ -317,23 +342,6 @@ export function PostForm() {
         </div>
       )}
 
-      {/* Aviso do Radar Google News */}
-      {radarNotice && (
-        <div className="p-4 rounded-2xl bg-orange-950/60 border border-[#ff6305]/40 text-orange-200 flex items-start justify-between gap-3 text-xs sm:text-sm">
-          <div className="flex items-start gap-2.5">
-            <Radio className="w-4 h-4 text-[#ff6305] shrink-0 mt-0.5 animate-pulse" />
-            <span>{radarNotice}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setRadarNotice(null)}
-            className="text-orange-400 hover:text-white"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
-
       {/* Grid de Edição: 2 Colunas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
         {/* Coluna Principal: Título, Subtítulo e Editor TipTap */}
@@ -367,28 +375,28 @@ export function PostForm() {
             />
           </div>
 
-          {/* CORPO EDITORIAL: TIPTAP RICH TEXT EDITOR (Substitui o <textarea>) */}
+          {/* CORPO EDITORIAL: TIPTAP RICH TEXT EDITOR */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold uppercase tracking-wider text-neutral-300">
                 Corpo do Texto Editorial <span className="text-[#ff6305]">*</span>
               </label>
               <span className="text-[11px] text-neutral-400 font-medium">
-                Editor Rico TipTap (HTML limpo)
+                Editor Rico TipTap (HTML limpo e responsivo)
               </span>
             </div>
 
             <TiptapEditor
               content={formData.content}
               onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
-              placeholder="Redija aqui a matéria com cabeçalhos H2/H3, negrito, itálico, links e citações..."
+              placeholder="Redija aqui a matéria com cabeçalhos H1/H2/H3/H4, fotos no texto, links e citações..."
             />
           </div>
         </div>
 
-        {/* Coluna Lateral: Upload de Imagens (UploadThing), Categoria, Tags e Créditos */}
+        {/* Coluna Lateral: Categorias Dinâmicas, Autores, Uploads, Tags */}
         <div className="space-y-6">
-          {/* Editoria / Categoria */}
+          {/* Editoria / Categoria Dinâmica */}
           <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-3">
             <label className="block text-xs font-bold uppercase tracking-wider text-neutral-300">
               Editoria Principal <span className="text-[#ff6305]">*</span>
@@ -398,12 +406,69 @@ export function PostForm() {
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+              {categories.map((cat) => (
+                <option key={cat.id || cat.slug} value={cat.name}>
+                  {cat.name}
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Autor / Quem Publicou */}
+          <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-[#ff6305]" />
+              <label className="block text-xs font-bold uppercase tracking-wider text-white">
+                Autor / Quem Publicou <span className="text-[#ff6305]">*</span>
+              </label>
+            </div>
+
+            {authors && authors.length > 0 ? (
+              <div className="space-y-2">
+                <select
+                  value={formData.authorId || ""}
+                  onChange={(e) => {
+                    const sel = authors.find((a) => a.id === e.target.value);
+                    setFormData({
+                      ...formData,
+                      authorId: e.target.value,
+                      author: sel ? sel.name : formData.author,
+                    });
+                  }}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+                >
+                  <option value="">Selecione o autor cadastrado...</option>
+                  {authors.map((auth) => (
+                    <option key={auth.id} value={auth.id}>
+                      {auth.name} ({auth.email})
+                    </option>
+                  ))}
+                </select>
+                <div className="pt-1">
+                  <label className="block text-[11px] text-neutral-400 mb-1">
+                    Nome de exibição personalizado (opcional):
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.author}
+                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                    placeholder="Ex: Tom Candido ou Redação Belezura"
+                    className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-[#ff6305]"
+                  />
+                </div>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={formData.author}
+                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                placeholder="Ex: Tom Candido ou Redação Belezura"
+                className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
+              />
+            )}
+            <p className="text-[11px] text-neutral-400">
+              Assinatura na matéria: <span className="text-[#ff6305] font-semibold">{formData.author || "Redação Belezura"}</span>
+            </p>
           </div>
 
           {/* UPLOAD DE IMAGEM DESKTOP (UploadThing com Drag & Drop) */}

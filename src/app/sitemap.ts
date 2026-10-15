@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://belezuranews.com.br";
 
-  const categories = ["beauty", "fashion", "business", "lifestyle", "reviews", "radar"];
+  const categories = ["beauty", "fashion", "business", "lifestyle", "reviews", "entrevistas"];
 
   const posts = [
     {

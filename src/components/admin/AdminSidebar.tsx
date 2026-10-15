@@ -7,7 +7,6 @@ import { signOut, useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
-  Radio,
   FileText,
   FolderTree,
   Mail,
@@ -34,12 +33,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  {
-    label: "Radar Google News",
-    href: "/admin/radar",
-    icon: Radio,
-    badge: "Ao Vivo",
-  },
   { label: "Postagens", href: "/admin/posts", icon: FileText },
   { label: "Categorias & Menus", href: "/admin/categorias", icon: FolderTree, adminOnly: true },
   { label: "Inscritos Newsletter", href: "/admin/newsletter", icon: Mail, adminOnly: true },

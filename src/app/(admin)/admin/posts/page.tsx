@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Radio,
   X,
   Loader2,
 } from "lucide-react";
@@ -128,14 +127,6 @@ export default function PostsAdminListPage() {
         </div>
 
         <div className="flex items-center gap-2.5">
-          <Link
-            href="/admin/radar"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 text-xs font-semibold transition-colors"
-          >
-            <Radio className="w-3.5 h-3.5 text-[#ff6305]" />
-            <span>Radar Google</span>
-          </Link>
-
           <Link
             href="/admin/posts/novo"
             className="font-alleron inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95"
