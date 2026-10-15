@@ -4,6 +4,7 @@ import { ArrowUpRight, Sparkles, Clock, Bookmark, MessageSquareQuote } from "luc
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 // ============================================================================
 // HELPERS DE FORMATAÇÃO EDITORIAL

@@ -14,6 +14,9 @@ import { SocialShareButtons } from "@/components/public/SocialShareButtons";
 import { InlineNewsletterBox } from "@/components/public/InlineNewsletterBox";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
 // ============================================================================
 // BASE DE DADOS DE FALLBACK (ARTIGOS EDITORIAIS DE DEMONSTRAÇÃO)
 // ============================================================================
