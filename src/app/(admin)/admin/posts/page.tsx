@@ -20,9 +20,6 @@ import {
 import { cn } from "@/lib/utils";
 import { AlertDialog } from "@/components/admin/AlertDialog";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 interface PostItem {
   id: string;
   title: string;

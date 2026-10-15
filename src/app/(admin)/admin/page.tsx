@@ -53,9 +53,6 @@ interface ViewsSummary {
   totalPosts: number;
 }
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default function AdminDashboardPage() {
   const [period, setPeriod] = useState<"week" | "month">("month");
   const [loading, setLoading] = useState(true);

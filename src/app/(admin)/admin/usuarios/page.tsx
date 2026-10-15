@@ -18,9 +18,6 @@ import {
 import { cn } from "@/lib/utils";
 import { AlertDialog } from "@/components/admin/AlertDialog";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 interface TeamMember {
   id: string;
   name: string;
