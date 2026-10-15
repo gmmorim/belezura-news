@@ -5,7 +5,8 @@ import { Clock, ArrowUpRight, Sparkles, ExternalLink } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 60;
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 interface CategoryMeta {
   title: string;

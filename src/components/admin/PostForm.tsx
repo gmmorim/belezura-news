@@ -67,7 +67,9 @@ export function PostForm() {
       setLoadingEditData(true);
       setSubmitError(null);
       try {
-        const res = await fetch(`/api/posts/${editId}`);
+        const res = await fetch(`/api/posts/${editId}`, {
+          cache: "no-store",
+        });
         if (!res.ok) {
           throw new Error("Não foi possível carregar os dados desta matéria.");
         }

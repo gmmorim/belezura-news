@@ -17,6 +17,7 @@ import {
   Layers,
   Clock,
   Users,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +49,12 @@ interface ViewsSummary {
   todayViews: string;
   activeReadersNow: number;
   avgReadTime: string;
+  totalLeads: string;
+  totalPosts: number;
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function AdminDashboardPage() {
   const [period, setPeriod] = useState<"week" | "month">("month");
@@ -57,23 +63,29 @@ export default function AdminDashboardPage() {
   const [categoryRanking, setCategoryRanking] = useState<CategoryRank[]>([]);
   const [tagRanking, setTagRanking] = useState<TagRank[]>([]);
   const [viewsSummary, setViewsSummary] = useState<ViewsSummary>({
-    totalPeriod: "84.250",
-    changeText: "+24.8% vs mês anterior",
-    todayViews: "3.410",
-    activeReadersNow: 38,
-    avgReadTime: "3m 42s",
+    totalPeriod: "0",
+    changeText: "Sincronizado via banco de dados",
+    todayViews: "0",
+    activeReadersNow: 0,
+    avgReadTime: "3 min",
+    totalLeads: "0",
+    totalPosts: 0,
   });
 
   const loadAnalytics = async (selectedPeriod: "week" | "month") => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/analytics?period=${selectedPeriod}`);
+      const res = await fetch(`/api/analytics?period=${selectedPeriod}`, {
+        cache: "no-store",
+      });
       const data = await res.json();
       if (data.success) {
         setTopPosts(data.topPosts || []);
         setCategoryRanking(data.categoryRanking || []);
         setTagRanking(data.tagRanking || []);
-        setViewsSummary(data.viewsSummary || viewsSummary);
+        if (data.viewsSummary) {
+          setViewsSummary(data.viewsSummary);
+        }
       }
     } catch (err) {
       console.error("Falha ao carregar dados de analytics:", err);
@@ -196,20 +208,20 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Tempo Médio de Leitura */}
+        {/* Base de Leads da Newsletter (100% Prisma) */}
         <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-medium text-neutral-400">Tempo Médio no Artigo</span>
+            <span className="text-xs font-medium text-neutral-400">Base de Leads (Newsletter)</span>
             <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
-              <Clock className="w-4 h-4" />
+              <Mail className="w-4 h-4" />
             </div>
           </div>
           <div>
             <p className="font-recoleta text-3xl font-bold text-white tracking-tight">
-              {viewsSummary.avgReadTime}
+              {viewsSummary.totalLeads}
             </p>
-            <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" /> Alto engajamento editorial
+            <p className="text-[11px] text-neutral-400 mt-1 flex items-center gap-1">
+              <span>Cadastros ativos no Belezura Drops</span>
             </p>
           </div>
         </div>

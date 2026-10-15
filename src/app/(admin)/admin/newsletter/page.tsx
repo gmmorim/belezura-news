@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Mail,
   Download,
@@ -10,7 +10,11 @@ import {
   Sparkles,
   TrendingUp,
   ShieldAlert,
+  Loader2,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface Subscriber {
   id: string;
@@ -20,26 +24,42 @@ interface Subscriber {
   status: "Ativo" | "Pendente";
 }
 
-const INITIAL_SUBSCRIBERS: Subscriber[] = [
-  { id: "1", email: "patricia.mendes@vogue.com.br", date: "Hoje, 14:20", source: "Rodapé do Portal", status: "Ativo" },
-  { id: "2", email: "camila.albuquerque@natura.net", date: "Hoje, 11:05", source: "Modal de Entrada", status: "Ativo" },
-  { id: "3", email: "lucas.venture@boticario.com.br", date: "Ontem, 18:40", source: "Rodapé do Portal", status: "Ativo" },
-  { id: "4", email: "bianca.rossi@sephora.com.br", date: "Ontem, 16:15", source: "Fim do Artigo", status: "Ativo" },
-  { id: "5", email: "carolina.ferraz@estilo.com.br", date: "11 Out 2026", source: "Rodapé do Portal", status: "Ativo" },
-];
-
 export default function AdminNewsletterPage() {
-  const [subscribers, setSubscribers] = useState<Subscriber[]>(INITIAL_SUBSCRIBERS);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
-  const filtered = subscribers.filter((s) =>
-    s.email.toLowerCase().includes(search.toLowerCase()) ||
-    s.source.toLowerCase().includes(search.toLowerCase())
+  // Carrega leads REAIS do banco via Prisma API com cache: no-store
+  useEffect(() => {
+    async function loadSubscribers() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/newsletter", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.subscribers)) {
+            setSubscribers(data.subscribers);
+          }
+        }
+      } catch (err) {
+        console.error("Falha ao carregar leads:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSubscribers();
+  }, []);
+
+  const filtered = subscribers.filter(
+    (s) =>
+      s.email.toLowerCase().includes(search.toLowerCase()) ||
+      s.source.toLowerCase().includes(search.toLowerCase())
   );
 
   // Exportação real de CSV para download no navegador
   const handleExportCSV = () => {
+    if (filtered.length === 0) return;
     const headers = "ID,E-mail,Data de Inscricao,Origem,Status\n";
     const rows = filtered
       .map((s) => `${s.id},"${s.email}","${s.date}","${s.source}",${s.status}`)
@@ -48,7 +68,10 @@ export default function AdminNewsletterPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `belezura-news-leads-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute(
+      "download",
+      `belezura-news-leads-${new Date().toISOString().slice(0, 10)}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -77,8 +100,9 @@ export default function AdminNewsletterPage() {
 
         <button
           type="button"
+          disabled={filtered.length === 0}
           onClick={handleExportCSV}
-          className="font-alleron self-start sm:self-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff6305] hover:bg-orange-600 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95"
+          className="font-alleron self-start sm:self-auto inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ff6305] hover:bg-orange-600 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md shadow-orange-500/20 active:scale-95"
         >
           <Download className="w-4 h-4" />
           <span>Exportar CSV</span>
@@ -92,24 +116,34 @@ export default function AdminNewsletterPage() {
         </div>
       )}
 
-      {/* Métricas dos Leads */}
+      {/* Métricas Reais dos Leads (100% Prisma) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
           <span className="text-xs font-medium text-neutral-400">Total de Assinantes Ativos</span>
-          <p className="font-recoleta text-3xl font-bold text-white mt-2">3.850</p>
-          <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1 font-medium">
-            <TrendingUp className="w-3 h-3" /> +18.4% este mês
+          <p className="font-recoleta text-3xl font-bold text-white mt-2">
+            {subscribers.filter((s) => s.status === "Ativo").length.toLocaleString("pt-BR")}
+          </p>
+          <p className="text-[11px] text-neutral-500 mt-1">
+            Leads reais sincronizados via banco de dados
           </p>
         </div>
         <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-          <span className="text-xs font-medium text-neutral-400">Novos Leads Hoje</span>
-          <p className="font-recoleta text-3xl font-bold text-white mt-2">47</p>
-          <p className="text-[11px] text-neutral-400 mt-1">Conversão média de 3.2%</p>
+          <span className="text-xs font-medium text-neutral-400">Total Geral de Inscrições</span>
+          <p className="font-recoleta text-3xl font-bold text-white mt-2">
+            {subscribers.length.toLocaleString("pt-BR")}
+          </p>
+          <p className="text-[11px] text-neutral-500 mt-1">Opt-in com conformidade LGPD</p>
         </div>
         <div className="p-5 rounded-2xl bg-neutral-900 border border-neutral-800">
-          <span className="text-xs font-medium text-neutral-400">Taxa de Abertura Estimada</span>
-          <p className="font-recoleta text-3xl font-bold text-white mt-2">44.8%</p>
-          <p className="text-[11px] text-[#ff6305] mt-1 font-semibold">Muito acima da média de mercado</p>
+          <span className="text-xs font-medium text-neutral-400">Status da Base</span>
+          <p className="font-recoleta text-3xl font-bold text-emerald-400 mt-2">
+            {subscribers.length > 0 ? "Ativa" : "Vazia"}
+          </p>
+          <p className="text-[11px] text-[#ff6305] mt-1 font-semibold">
+            {subscribers.length > 0
+              ? `${subscribers.length} contatos prontos para disparo`
+              : "Aguardando primeiros cadastros na Home/Footer"}
+          </p>
         </div>
       </div>
 
@@ -133,29 +167,40 @@ export default function AdminNewsletterPage() {
 
         {/* Lista Adaptável para Mobile */}
         <div className="divide-y divide-neutral-800">
-          {filtered.map((sub) => (
-            <div
-              key={sub.id}
-              className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-neutral-800/40 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-300 shrink-0">
-                  <Mail className="w-4 h-4 text-[#ff6305]" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{sub.email}</p>
-                  <p className="text-xs text-neutral-400">Origem: {sub.source}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between sm:justify-end gap-4 text-xs text-neutral-400 pl-12 sm:pl-0">
-                <span>{sub.date}</span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  {sub.status}
-                </span>
-              </div>
+          {loading ? (
+            <div className="p-12 text-center text-neutral-500 text-sm flex items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin text-[#ff6305]" />
+              <span>Carregando leads do banco...</span>
             </div>
-          ))}
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center text-neutral-500 text-sm">
+              Nenhum lead encontrado no banco de dados.
+            </div>
+          ) : (
+            filtered.map((sub) => (
+              <div
+                key={sub.id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-neutral-800/40 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-300 shrink-0">
+                    <Mail className="w-4 h-4 text-[#ff6305]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{sub.email}</p>
+                    <p className="text-xs text-neutral-400">Origem: {sub.source}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-end gap-4 text-xs text-neutral-400 pl-12 sm:pl-0">
+                  <span>{sub.date}</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    {sub.status}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

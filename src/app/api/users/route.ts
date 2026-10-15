@@ -4,6 +4,7 @@ import { getAuthenticatedUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 /**
  * GET /api/users

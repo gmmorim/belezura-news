@@ -1,134 +1,142 @@
 import { NextRequest, NextResponse } from "next/server";
-import { internalViewsStore } from "@/lib/views-store";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get("period") || "month";
 
-    // Top 10 Postagens mais lidas
-    const topPosts = [
-      {
-        id: "1",
-        title: "A nova era do minimalismo botânico: o ingrediente que está revolucionando o skincare de luxo.",
-        slug: "minimalismo-botanico-skincare-luxo",
-        category: "Beauty",
-        author: "Helena Castro",
-        views: internalViewsStore["minimalismo-botanico-skincare-luxo"] || 1420,
-        publishedAt: "13 Out 2026",
-      },
-      {
-        id: "2",
-        title: "Fusões milionárias: gigantes de cosméticos aceleram aquisições no Brasil.",
-        slug: "fusoes-gigantes-cosmeticos-brasil",
-        category: "Business",
-        author: "Lucas Ferreira",
-        views: internalViewsStore["fusoes-gigantes-cosmeticos-brasil"] || 890,
-        publishedAt: "13 Out 2026",
-      },
-      {
-        id: "3",
-        title: "A rotina matinal das fundadoras de startups de beleza que faturam milhões.",
-        slug: "rotina-matinal-fundadoras-startups",
-        category: "Lifestyle",
-        author: "Camila Duarte",
-        views: internalViewsStore["rotina-matinal-fundadoras-startups"] || 640,
-        publishedAt: "12 Out 2026",
-      },
-      {
-        id: "4",
-        title: "Milan Fashion Week antecipa o retorno da elegância utilitária e tons terrosos.",
-        slug: "milan-fashion-week-elegancia-utilitaria",
-        category: "Fashion",
-        author: "Lucas Ferreira",
-        views: 520,
-        publishedAt: "12 Out 2026",
-      },
-      {
-        id: "5",
-        title: "Testamos a base com acabamento sérum que viralizou entre maquiadores de celebridades.",
-        slug: "testamos-base-acabamento-serum-review",
-        category: "Reviews",
-        author: "Mariana Costa",
-        views: 480,
-        publishedAt: "11 Out 2026",
-      },
-      {
-        id: "6",
-        title: "O ácido poliglutâmico desbanca o hialurônico como o ativo favorito da dermatologia.",
-        slug: "acido-poliglutamico-skincare",
-        category: "Beauty",
-        author: "Helena Castro",
-        views: 410,
-        publishedAt: "10 Out 2026",
-      },
-      {
-        id: "7",
-        title: "Marcas independentes de perfume autoral crescem 42% no Brasil desafiando importados.",
-        slug: "marcas-independentes-perfume-autoral-brasil",
-        category: "Business",
-        author: "Lucas Ferreira",
-        views: 390,
-        publishedAt: "10 Out 2026",
-      },
-      {
-        id: "8",
-        title: "O turismo de longevidade ganha força entre executivas 35+ que buscam pausas regenerativas.",
-        slug: "turismo-longevidade-spas-saude",
-        category: "Lifestyle",
-        author: "Camila Duarte",
-        views: 345,
-        publishedAt: "09 Out 2026",
-      },
-      {
-        id: "9",
-        title: "Os 5 tratamentos dermatológicos não invasivos mais procurados desta temporada.",
-        slug: "tratamentos-esteticos-nao-invasivos",
-        category: "Beauty",
-        author: "Mariana Costa",
-        views: 310,
-        publishedAt: "09 Out 2026",
-      },
-      {
-        id: "10",
-        title: "A volta dos acessórios esculturais e metais escovados na joalheria moderna.",
-        slug: "acessorios-esculturais-joalheria-tendencia",
-        category: "Fashion",
-        author: "Lucas Ferreira",
-        views: 295,
-        publishedAt: "08 Out 2026",
-      },
-    ];
+    // 1. Data de Início do Período (Mês ou Semana)
+    const now = new Date();
+    const periodStartDate = new Date();
+    if (period === "week") {
+      periodStartDate.setDate(now.getDate() - 7);
+    } else {
+      periodStartDate.setMonth(now.getMonth() - 1);
+    }
 
-    // Ranking de Categorias Mais Acessadas
-    const categoryRanking = [
-      { name: "Beauty", views: 2140, share: 38 },
-      { name: "Business", views: 1280, share: 23 },
-      { name: "Fashion", views: 920, share: 16 },
-      { name: "Lifestyle", views: 760, share: 14 },
-      { name: "Reviews", views: 490, share: 9 },
-    ];
+    // 2. Início do Dia Atual (para visualizações de hoje)
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
-    // Ranking de Tags Mais Utilizadas pela Redação
-    const tagRanking = [
-      { tag: "skincare", count: 42, views: 3200 },
-      { tag: "tendencias", count: 35, views: 2850 },
-      { tag: "luxo", count: 28, views: 2400 },
-      { tag: "business", count: 22, views: 1950 },
-      { tag: "beleza-limpa", count: 18, views: 1620 },
-      { tag: "milao", count: 14, views: 1250 },
-      { tag: "resenha", count: 12, views: 980 },
-    ];
+    // 3. Leitores em Tempo Real (últimos 15 minutos em post_views)
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
 
-    // Resumo de Visualizações
+    // =========================================================================
+    // CONSULTAS REAIS AO PRISMA (ZERO DADOS HARDCODED)
+    // =========================================================================
+
+    // A. Soma Real de Visualizações de Todos os Posts
+    const totalViewsAgg = await prisma.post.aggregate({
+      where: { status: "PUBLISHED" },
+      _sum: { views: true },
+    });
+    const totalViewsNumber = totalViewsAgg._sum.views || 0;
+
+    // B. Total Real de Leads da Newsletter
+    const totalLeads = await prisma.newsletterSubscriber.count();
+
+    // C. Total de Matérias Publicadas
+    const totalPublishedPosts = await prisma.post.count({
+      where: { status: "PUBLISHED" },
+    });
+
+    // D. Logs de Visualização de Hoje
+    const todayViewsCount = await prisma.postView.count({
+      where: {
+        createdAt: { gte: startOfToday },
+      },
+    });
+
+    // E. Leitores Ativos Agora
+    const activeReadersCount = await prisma.postView.count({
+      where: {
+        createdAt: { gte: fifteenMinutesAgo },
+      },
+    });
+
+    // F. Top 10 Matérias Mais Lidas do Banco
+    const dbTopPosts = await prisma.post.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { views: "desc" },
+      take: 10,
+      include: {
+        category: true,
+        author: true,
+      },
+    });
+
+    const topPosts = dbTopPosts.map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      category: p.category?.name || "Geral",
+      author: p.author?.name || "Redação Belezura",
+      views: p.views,
+      publishedAt: new Intl.DateTimeFormat("pt-BR", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(p.publishedAt || p.createdAt),
+    }));
+
+    // G. Ranking Real de Categorias por Visualizações
+    const dbCategories = await prisma.category.findMany({
+      include: {
+        posts: {
+          where: { status: "PUBLISHED" },
+          select: { views: true },
+        },
+      },
+    });
+
+    const categoryRanking = dbCategories
+      .map((cat) => {
+        const catViews = cat.posts.reduce((sum, post) => sum + (post.views || 0), 0);
+        const share =
+          totalViewsNumber > 0 ? Math.round((catViews / totalViewsNumber) * 100) : 0;
+        return {
+          name: cat.name,
+          views: catViews,
+          share,
+        };
+      })
+      .sort((a, b) => b.views - a.views);
+
+    // H. Ranking Real de Tags Utilizadas
+    const dbTags = await prisma.tag.findMany({
+      include: {
+        posts: {
+          where: { status: "PUBLISHED" },
+          select: { views: true },
+        },
+      },
+    });
+
+    const tagRanking = dbTags
+      .map((tag) => {
+        const tagViews = tag.posts.reduce((sum, p) => sum + (p.views || 0), 0);
+        return {
+          tag: tag.name,
+          count: tag.posts.length,
+          views: tagViews,
+        };
+      })
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 10);
+
+    // I. Resumo das Métricas com Formatação Visual
     const viewsSummary = {
-      totalPeriod: period === "week" ? "18.420" : "84.250",
-      changeText: period === "week" ? "+14% vs semana anterior" : "+24.8% vs mês anterior",
-      todayViews: "3.410",
-      activeReadersNow: 38,
-      avgReadTime: "3m 42s",
+      totalPeriod: totalViewsNumber.toLocaleString("pt-BR"),
+      changeText: totalPublishedPosts > 0 ? `${totalPublishedPosts} matérias publicadas` : "Aguardando novas pautas",
+      todayViews: todayViewsCount.toLocaleString("pt-BR"),
+      activeReadersNow: activeReadersCount,
+      avgReadTime: "3 min",
+      totalLeads: totalLeads.toLocaleString("pt-BR"),
+      totalPosts: totalPublishedPosts,
     };
 
     return NextResponse.json({
@@ -139,8 +147,15 @@ export async function GET(request: NextRequest) {
       tagRanking,
       viewsSummary,
     });
-  } catch (error) {
-    console.error("Erro na rota de analytics:", error);
-    return NextResponse.json({ success: false }, { status: 500 });
+  } catch (error: any) {
+    console.error("[ANALYTICS_ERROR]", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Erro ao carregar dados analíticos reais.",
+        details: error.message,
+      },
+      { status: 500 }
+    );
   }
 }

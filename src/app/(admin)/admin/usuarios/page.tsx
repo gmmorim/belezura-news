@@ -18,6 +18,9 @@ import {
 import { cn } from "@/lib/utils";
 import { AlertDialog } from "@/components/admin/AlertDialog";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface TeamMember {
   id: string;
   name: string;
@@ -27,35 +30,8 @@ interface TeamMember {
   joinedDate: string;
 }
 
-const INITIAL_TEAM: TeamMember[] = [
-  {
-    id: "1",
-    name: "Helena Castro",
-    email: "helena@belezuranews.com.br",
-    role: "ADMIN",
-    postsCount: 68,
-    joinedDate: "Março 2026",
-  },
-  {
-    id: "2",
-    name: "Lucas Ferreira",
-    email: "lucas@belezuranews.com.br",
-    role: "REDATOR",
-    postsCount: 44,
-    joinedDate: "Maio 2026",
-  },
-  {
-    id: "3",
-    name: "Mariana Costa",
-    email: "mariana@belezuranews.com.br",
-    role: "REDATOR",
-    postsCount: 36,
-    joinedDate: "Junho 2026",
-  },
-];
-
 export default function AdminUsuariosPage() {
-  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM);
+  const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [newMember, setNewMember] = useState({
@@ -74,10 +50,10 @@ export default function AdminUsuariosPage() {
   useEffect(() => {
     async function loadUsers() {
       try {
-        const res = await fetch("/api/users");
+        const res = await fetch("/api/users", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
-          if (data.users && data.users.length > 0) {
+          if (Array.isArray(data.users)) {
             setTeam(data.users);
           }
         }
@@ -324,7 +300,17 @@ export default function AdminUsuariosPage() {
 
       {/* Lista da Equipe */}
       <div className="bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden divide-y divide-neutral-800">
-        {team.map((member) => (
+        {loading ? (
+          <div className="p-12 text-center text-neutral-400 text-sm flex items-center justify-center gap-3">
+            <Loader2 className="w-5 h-5 text-[#ff6305] animate-spin" />
+            <span>Carregando membros da equipe...</span>
+          </div>
+        ) : team.length === 0 ? (
+          <div className="p-12 text-center text-neutral-500 text-sm">
+            Nenhum membro encontrado.
+          </div>
+        ) : (
+          team.map((member) => (
           <div
             key={member.id}
             className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-neutral-800/40 transition-colors"
@@ -367,7 +353,7 @@ export default function AdminUsuariosPage() {
               </button>
             </div>
           </div>
-        ))}
+        )))}
       </div>
 
       {/* Modal de Confirmação de Exclusão de Usuário (AlertDialog) */}

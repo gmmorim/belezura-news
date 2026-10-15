@@ -40,7 +40,9 @@ export default function RadarNewsPage() {
       if (category !== "all") url.searchParams.set("category", category);
       if (query.trim()) url.searchParams.set("q", query.trim());
 
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), {
+        cache: "no-store",
+      });
       const data = await res.json();
       if (data.success && Array.isArray(data.items)) {
         setItems(data.items);

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, hashClientIp } from "@/lib/security";
-import { internalViewsStore, internalViewLogs } from "@/lib/views-store";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function POST(
   request: NextRequest,
@@ -17,7 +20,7 @@ export async function GET(
   return handleIncrementView(request, params.id);
 }
 
-function handleIncrementView(request: NextRequest, slug: string) {
+async function handleIncrementView(request: NextRequest, slug: string) {
   try {
     // 1. Extração segura e anonimização do IP (Em conformidade com LGPD/GDPR)
     const forwardedFor = request.headers.get("x-forwarded-for");
@@ -36,7 +39,6 @@ function handleIncrementView(request: NextRequest, slug: string) {
           success: false,
           error: "Rate limit excedido para este artigo.",
           retryAfter: rateLimit.resetInSeconds,
-          currentViews: internalViewsStore[slug] || 0,
         },
         {
           status: 429,
@@ -49,28 +51,41 @@ function handleIncrementView(request: NextRequest, slug: string) {
       );
     }
 
-    // 3. Incremento seguro de view computada
-    const current = internalViewsStore[slug] || 0;
-    internalViewsStore[slug] = current + 1;
-
-    // Registra log temporal com categoria detectada
-    const category = slug.includes("business") || slug.includes("fusoes")
-      ? "Business"
-      : slug.includes("rotina")
-      ? "Lifestyle"
-      : "Beauty";
-
-    internalViewLogs.push({
-      slug,
-      timestamp: Date.now(),
-      category,
+    // 3. Localizar matéria por slug ou id
+    const post = await prisma.post.findFirst({
+      where: {
+        OR: [{ slug }, { id: slug }],
+      },
+      select: { id: true, views: true, slug: true },
     });
+
+    if (!post) {
+      return NextResponse.json(
+        { success: false, error: "Matéria não encontrada." },
+        { status: 404 }
+      );
+    }
+
+    // 4. Incremento atômico no banco de dados e log temporal para analytics
+    const [updatedPost] = await prisma.$transaction([
+      prisma.post.update({
+        where: { id: post.id },
+        data: { views: { increment: 1 } },
+        select: { id: true, views: true, slug: true },
+      }),
+      prisma.postView.create({
+        data: {
+          postId: post.id,
+          sessionHash: ipHash,
+        },
+      }),
+    ]);
 
     return NextResponse.json(
       {
         success: true,
-        slug,
-        views: internalViewsStore[slug],
+        slug: updatedPost.slug,
+        views: updatedPost.views,
       },
       {
         headers: {

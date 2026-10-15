@@ -1,1 +1,1 @@
-export { default, metadata, dynamic } from "../feed/page";
+export { default, metadata, dynamic, revalidate, fetchCache } from "../feed/page";

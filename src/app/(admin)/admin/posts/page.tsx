@@ -15,9 +15,13 @@ import {
   Clock,
   Radio,
   X,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlertDialog } from "@/components/admin/AlertDialog";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface PostItem {
   id: string;
@@ -31,44 +35,8 @@ interface PostItem {
   image: string;
 }
 
-const INITIAL_POSTS: PostItem[] = [
-  {
-    id: "1",
-    title: "A nova era do minimalismo botânico: o ingrediente que está revolucionando o skincare de luxo.",
-    slug: "minimalismo-botanico-skincare-luxo",
-    category: "Beauty",
-    author: "Helena Castro",
-    status: "PUBLISHED",
-    views: 1420,
-    date: "13 Out 2026",
-    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=300&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    title: "Fusões milionárias: gigantes de cosméticos aceleram aquisições no Brasil.",
-    slug: "fusoes-gigantes-cosmeticos-brasil",
-    category: "Business",
-    author: "Lucas Ferreira",
-    status: "PUBLISHED",
-    views: 890,
-    date: "13 Out 2026",
-    image: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?q=80&w=300&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    title: "Testamos o protetor solar com efeito primer que virou febre no TikTok.",
-    slug: "tratamentos-esteticos-nao-invasivos-sp",
-    category: "Reviews",
-    author: "Mariana Costa",
-    status: "DRAFT",
-    views: 0,
-    date: "12 Out 2026",
-    image: "https://images.unsplash.com/photo-1512290900672-1f4864459f3c?q=80&w=300&auto=format&fit=crop",
-  },
-];
-
 export default function PostsAdminListPage() {
-  const [posts, setPosts] = useState<PostItem[]>(INITIAL_POSTS);
+  const [posts, setPosts] = useState<PostItem[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -82,10 +50,10 @@ export default function PostsAdminListPage() {
   useEffect(() => {
     async function loadPosts() {
       try {
-        const res = await fetch("/api/posts");
+        const res = await fetch("/api/posts", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
-          if (data.posts && data.posts.length > 0) {
+          if (Array.isArray(data.posts)) {
             setPosts(data.posts);
           }
         }
@@ -248,7 +216,12 @@ export default function PostsAdminListPage() {
 
       {/* Lista Responsiva de Posts */}
       <div className="bg-neutral-900 rounded-2xl border border-neutral-800 overflow-hidden divide-y divide-neutral-800">
-        {filteredPosts.length === 0 ? (
+        {loading ? (
+          <div className="p-12 text-center text-neutral-400 text-sm flex items-center justify-center gap-3">
+            <Loader2 className="w-5 h-5 text-[#ff6305] animate-spin" />
+            <span>Carregando matérias do banco de dados...</span>
+          </div>
+        ) : filteredPosts.length === 0 ? (
           <div className="p-12 text-center text-neutral-500 text-sm">
             Nenhuma matéria encontrada com os filtros selecionados.
           </div>

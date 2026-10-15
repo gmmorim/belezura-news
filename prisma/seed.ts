@@ -204,11 +204,40 @@ async function main() {
     console.warn("  ⚠️ Não foi possível conectar ao RSS do Google News online. Usando fallback editorial de alta fidelidade.");
   }
 
+  const EDITORIAL_FALLBACK_NEWS = [
+    {
+      title: "A nova era do minimalismo botânico: o ingrediente que está revolucionando o skincare de luxo - Vogue Brasil",
+      contentSnippet: "Marcas internacionais de cosméticos de luxo apostam em fórmulas limpas com biotecnologia botânica de alta absorção celular.",
+      link: "https://vogue.globo.com",
+    },
+    {
+      title: "Fusões milionárias: gigantes de cosméticos aceleram aquisições no Brasil - Bloomberg Línea",
+      contentSnippet: "Com crescimento recorde de dois dígitos no consumo de dermocosméticos, fundos globais ampliam investimentos no varejo nacional.",
+      link: "https://bloomberglinea.com.br",
+    },
+    {
+      title: "Alfaiataria utilitária e tons minerais dominam a temporada internacional de moda - Elle Magazine",
+      contentSnippet: "As passarelas de Milão e Paris consagram cortes fluidos, tecidos sustentáveis e paletas inspiradas em pigmentos naturais da terra.",
+      link: "https://elle.com.br",
+    },
+    {
+      title: "Retiros de longevidade e biohacking: a nova fronteira do bem-estar de alto padrão - GQ Brasil",
+      contentSnippet: "Spas médicos e protocolos de revitalização celular transformam a indústria do descanso em uma ciência focada em saúde preventiva.",
+      link: "https://gq.globo.com",
+    },
+    {
+      title: "Testamos os protetores solares com tecnologia primer que viraram sensação editorial - Belezura Lab",
+      contentSnippet: "Avaliamos sensorial, durabilidade e proteção contra luz visível dos produtos mais comentados da temporada.",
+      link: "https://belezuranews.com.br",
+    },
+  ];
+
   // --------------------------------------------------------------------------
   // 4. MAPEAR E INSERIR 5 MATÉRIAS REAIS NO PRISMA
   // --------------------------------------------------------------------------
   // Pega os 5 primeiros itens válidos do RSS (ou fallback se o feed estiver indisponível)
-  const selectedNews = feedItems.slice(0, 5);
+  const newsSource = feedItems.length > 0 ? feedItems : EDITORIAL_FALLBACK_NEWS;
+  const selectedNews = newsSource.slice(0, 5);
 
   // Intervalos de publicação nos últimos 3 dias para simular feed vivo
   const now = Date.now();

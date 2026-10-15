@@ -8,6 +8,7 @@ import {
 } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 /**
  * GET /api/posts/[id]
