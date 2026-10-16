@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
 import {
   ArrowLeft,
   Eye,
@@ -16,6 +17,7 @@ import {
   Loader2,
   Trash2,
   User,
+  Check,
 } from "lucide-react";
 import { LivePreviewModal, PostFormData } from "@/components/admin/LivePreviewModal";
 import { TiptapEditor } from "@/components/admin/TiptapEditor";
@@ -60,22 +62,33 @@ export function PostForm({
   );
   const [authors, setAuthors] = useState<PostAuthorOption[]>(initialAuthors);
 
-  // Estados do Formulário
-  const [formData, setFormData] = useState<PostFormData>({
-    title: "",
-    subtitle: "",
-    category: initialCategories[0]?.name || "Beauty",
-    author: initialAuthors[0]?.name || "Redação Belezura",
-    authorId: initialAuthors[0]?.id || "",
-    date: new Date().toISOString().slice(0, 16),
-    imageWeb: "",
-    imageMobile: "",
-    imageSourceText: "",
-    imageSourceUrl: "",
-    content: "",
-    tags: ["tendencias"],
-    status: "DRAFT",
+  // Integração com React Hook Form
+  const {
+    register,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+    clearErrors,
+  } = useForm<PostFormData>({
+    defaultValues: {
+      title: "",
+      subtitle: "",
+      category: initialCategories[0]?.name || "Beauty",
+      author: initialAuthors[0]?.name || "Redação Belezura",
+      authorId: initialAuthors[0]?.id || "",
+      date: new Date().toISOString().slice(0, 16),
+      imageWeb: "",
+      imageMobile: "",
+      imageSourceText: "",
+      imageSourceUrl: "",
+      content: "",
+      tags: ["tendencias"],
+      status: "DRAFT",
+    },
   });
+
+  const formData = watch();
 
   const [tagInput, setTagInput] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -95,17 +108,16 @@ export function PostForm({
         .then((data) => {
           if (data.success && Array.isArray(data.categories) && data.categories.length > 0) {
             setCategories(data.categories);
-            setFormData((prev) => ({
-              ...prev,
-              category: prev.category || data.categories[0].name,
-            }));
+            if (!watch("category")) {
+              setValue("category", data.categories[0].name, { shouldDirty: true });
+            }
           }
         })
         .catch((err) => console.warn("Aviso ao carregar categorias dinâmicas:", err));
     }
-  }, [initialCategories]);
+  }, [initialCategories, setValue, watch]);
 
-  // 1. CARREGAMENTO DOS DADOS PARA EDIÇÃO (Resolve o bug de campos vazios e autorId)
+  // 1. CARREGAMENTO DOS DADOS PARA EDIÇÃO (Reset no React Hook Form)
   useEffect(() => {
     if (!editId) return;
 
@@ -122,7 +134,7 @@ export function PostForm({
         }
         const data = await res.json();
         if (data.success && data.post && isMounted) {
-          setFormData({
+          reset({
             title: data.post.title || "",
             subtitle: data.post.subtitle || "",
             category: data.post.category || "Beauty",
@@ -154,39 +166,44 @@ export function PostForm({
     return () => {
       isMounted = false;
     };
-  }, [editId]);
+  }, [editId, reset]);
 
-  // Manipulação de Tags
+  // Manipulação de Tags com React Hook Form
   const handleAddTag = () => {
     const clean = tagInput.trim().replace(/^#/, "");
-    if (clean && !formData.tags.includes(clean)) {
-      setFormData((prev) => ({ ...prev, tags: [...prev.tags, clean] }));
+    const currentTags = watch("tags") || [];
+    if (clean && !currentTags.includes(clean)) {
+      setValue("tags", [...currentTags, clean], { shouldValidate: true, shouldDirty: true });
       setTagInput("");
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((t) => t !== tagToRemove),
-    }));
+    const currentTags = watch("tags") || [];
+    setValue(
+      "tags",
+      currentTags.filter((t) => t !== tagToRemove),
+      { shouldValidate: true, shouldDirty: true }
+    );
   };
 
   // Salvar (POST para novo post, PUT para edição)
   const handleSubmit = async (targetStatus: "DRAFT" | "PUBLISHED") => {
     setSubmitError(null);
 
-    if (!formData.title || formData.title.trim().length < 5) {
+    const currentValues = watch();
+
+    if (!currentValues.title || currentValues.title.trim().length < 5) {
       setSubmitError("O título da matéria deve conter pelo menos 5 caracteres.");
       return;
     }
 
-    if (!formData.content || formData.content.trim().length < 10) {
+    if (!currentValues.content || currentValues.content.trim().length < 10) {
       setSubmitError("O conteúdo da matéria deve conter pelo menos 10 caracteres.");
       return;
     }
 
-    if (!formData.imageWeb) {
+    if (!currentValues.imageWeb) {
       setSubmitError("É obrigatório fazer o upload ou informar a imagem de capa para Desktop.");
       return;
     }
@@ -195,7 +212,7 @@ export function PostForm({
 
     try {
       const payload = {
-        ...formData,
+        ...currentValues,
         status: targetStatus,
       };
 
@@ -354,8 +371,8 @@ export function PostForm({
             <input
               type="text"
               required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              value={formData.title || ""}
+              onChange={(e) => setValue("title", e.target.value, { shouldValidate: true, shouldDirty: true })}
               placeholder="Ex: A ascensão do quiet luxury na alta perfumaria nacional..."
               className="w-full px-4 py-3 bg-neutral-900 border border-neutral-800 rounded-xl text-base sm:text-lg text-white font-medium placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             />
@@ -368,8 +385,8 @@ export function PostForm({
             </label>
             <input
               type="text"
-              value={formData.subtitle}
-              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+              value={formData.subtitle || ""}
+              onChange={(e) => setValue("subtitle", e.target.value, { shouldValidate: true, shouldDirty: true })}
               placeholder="Resumo afiado que instiga a leitura no feed e abaixo da manchete..."
               className="w-full px-4 py-3 bg-neutral-900 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             />
@@ -387,8 +404,8 @@ export function PostForm({
             </div>
 
             <TiptapEditor
-              content={formData.content}
-              onChange={(html) => setFormData((prev) => ({ ...prev, content: html }))}
+              content={formData.content || ""}
+              onChange={(html) => setValue("content", html, { shouldValidate: true, shouldDirty: true })}
               placeholder="Redija aqui a matéria com cabeçalhos H1/H2/H3/H4, fotos no texto, links e citações..."
             />
           </div>
@@ -403,7 +420,7 @@ export function PostForm({
             </label>
             <select
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => setValue("category", e.target.value, { shouldValidate: true, shouldDirty: true })}
               className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             >
               {categories.map((cat) => (
@@ -429,11 +446,10 @@ export function PostForm({
                   value={formData.authorId || ""}
                   onChange={(e) => {
                     const sel = authors.find((a) => a.id === e.target.value);
-                    setFormData({
-                      ...formData,
-                      authorId: e.target.value,
-                      author: sel ? sel.name : formData.author,
-                    });
+                    setValue("authorId", e.target.value, { shouldValidate: true, shouldDirty: true });
+                    if (sel) {
+                      setValue("author", sel.name, { shouldValidate: true, shouldDirty: true });
+                    }
                   }}
                   className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
                 >
@@ -450,8 +466,8 @@ export function PostForm({
                   </label>
                   <input
                     type="text"
-                    value={formData.author}
-                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                    value={formData.author || ""}
+                    onChange={(e) => setValue("author", e.target.value, { shouldValidate: true, shouldDirty: true })}
                     placeholder="Ex: Tom Candido ou Redação Belezura"
                     className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-[#ff6305]"
                   />
@@ -460,8 +476,8 @@ export function PostForm({
             ) : (
               <input
                 type="text"
-                value={formData.author}
-                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                value={formData.author || ""}
+                onChange={(e) => setValue("author", e.target.value, { shouldValidate: true, shouldDirty: true })}
                 placeholder="Ex: Tom Candido ou Redação Belezura"
                 className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
               />
@@ -471,47 +487,74 @@ export function PostForm({
             </p>
           </div>
 
-          {/* UPLOAD DE IMAGEM DESKTOP (UploadThing com Drag & Drop) */}
+          {/* UPLOAD DE IMAGEM DESKTOP (UploadThing com React Hook Form e Feedback Visual) */}
           <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-4">
-            <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-[#ff6305]" />
-              <label className="block text-xs font-bold uppercase tracking-wider text-white">
-                Imagem de Capa (Desktop) <span className="text-[#ff6305]">*</span>
-              </label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-[#ff6305]" />
+                <label className="block text-xs font-bold uppercase tracking-wider text-white">
+                  Imagem de Capa (Desktop) <span className="text-[#ff6305]">*</span>
+                </label>
+              </div>
+
+              {formData.imageWeb && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  Imagem Carregada com Sucesso
+                </span>
+              )}
             </div>
 
             {formData.imageWeb ? (
-              <div className="space-y-2">
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-neutral-700 bg-neutral-950">
+              <div className="space-y-3">
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-emerald-500/40 bg-neutral-950 group shadow-lg">
                   <img
                     src={formData.imageWeb}
                     alt="Preview Desktop"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue("imageWeb", "", { shouldValidate: true, shouldDirty: true });
+                      }}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md transition-colors"
+                      title="Remover ou trocar imagem"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Trocar Imagem</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-neutral-400 px-1">
+                  <span className="truncate max-w-[260px]" title={formData.imageWeb}>
+                    {formData.imageWeb}
+                  </span>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, imageWeb: "" })}
-                    className="absolute top-2 right-2 p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg transition-colors shadow-md"
-                    title="Remover imagem"
+                    onClick={() => {
+                      setValue("imageWeb", "", { shouldValidate: true, shouldDirty: true });
+                    }}
+                    className="text-red-400 hover:text-red-300 font-medium ml-2 shrink-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    Remover
                   </button>
                 </div>
-                <p className="text-[11px] text-neutral-400 truncate">
-                  {formData.imageWeb}
-                </p>
               </div>
             ) : (
               <div className="space-y-3">
                 <UploadDropzone
                   endpoint="postImageUploader"
                   onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        imageWeb: res[0].url,
-                        imageMobile: prev.imageMobile || res[0].url,
-                      }));
+                    const fileUrl = res?.[0]?.url || (res?.[0] as any)?.ufsUrl || (res?.[0] as any)?.appUrl || "";
+                    if (fileUrl) {
+                      setValue("imageWeb", fileUrl, { shouldValidate: true, shouldDirty: true });
+                      if (!watch("imageMobile")) {
+                        setValue("imageMobile", fileUrl, { shouldValidate: true, shouldDirty: true });
+                      }
+                      setSubmitError(null);
                     }
                   }}
                   onUploadError={(error: Error) => {
@@ -522,38 +565,70 @@ export function PostForm({
                 <input
                   type="url"
                   placeholder="Ou cole uma URL direta da imagem..."
-                  value={formData.imageWeb}
-                  onChange={(e) => setFormData({ ...formData, imageWeb: e.target.value })}
+                  value={formData.imageWeb || ""}
+                  onChange={(e) => {
+                    setValue("imageWeb", e.target.value, { shouldValidate: true, shouldDirty: true });
+                    if (e.target.value) setSubmitError(null);
+                  }}
                   className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-[#ff6305]"
                 />
               </div>
             )}
           </div>
 
-          {/* UPLOAD DE IMAGEM MOBILE (UploadThing Opcional) */}
+          {/* UPLOAD DE IMAGEM MOBILE (UploadThing com React Hook Form e Feedback Visual) */}
           <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-4">
-            <div className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-[#ff6305]" />
-              <label className="block text-xs font-bold uppercase tracking-wider text-white">
-                Imagem Mobile (Opcional)
-              </label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-[#ff6305]" />
+                <label className="block text-xs font-bold uppercase tracking-wider text-white">
+                  Imagem Mobile (Opcional)
+                </label>
+              </div>
+
+              {formData.imageMobile && formData.imageMobile !== formData.imageWeb && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  Imagem Mobile Carregada
+                </span>
+              )}
             </div>
 
             {formData.imageMobile && formData.imageMobile !== formData.imageWeb ? (
-              <div className="space-y-2">
-                <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden border border-neutral-700 bg-neutral-950">
+              <div className="space-y-3">
+                <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden border border-emerald-500/40 bg-neutral-950 group shadow-lg">
                   <img
                     src={formData.imageMobile}
                     alt="Preview Mobile"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setValue("imageMobile", "", { shouldValidate: true, shouldDirty: true });
+                      }}
+                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md transition-colors"
+                      title="Remover ou trocar imagem mobile"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Trocar Imagem</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] text-neutral-400 px-1">
+                  <span className="truncate max-w-[260px]" title={formData.imageMobile}>
+                    {formData.imageMobile}
+                  </span>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, imageMobile: "" })}
-                    className="absolute top-2 right-2 p-1.5 bg-red-600/90 hover:bg-red-600 text-white rounded-lg transition-colors shadow-md"
-                    title="Remover imagem"
+                    onClick={() => {
+                      setValue("imageMobile", "", { shouldValidate: true, shouldDirty: true });
+                    }}
+                    className="text-red-400 hover:text-red-300 font-medium ml-2 shrink-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    Remover
                   </button>
                 </div>
               </div>
@@ -562,11 +637,10 @@ export function PostForm({
                 <UploadDropzone
                   endpoint="postImageUploader"
                   onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        imageMobile: res[0].url,
-                      }));
+                    const fileUrl = res?.[0]?.url || (res?.[0] as any)?.ufsUrl || (res?.[0] as any)?.appUrl || "";
+                    if (fileUrl) {
+                      setValue("imageMobile", fileUrl, { shouldValidate: true, shouldDirty: true });
+                      setSubmitError(null);
                     }
                   }}
                   onUploadError={(error: Error) => {
@@ -586,15 +660,15 @@ export function PostForm({
             <input
               type="text"
               placeholder="Ex: Getty Images / Divulgação"
-              value={formData.imageSourceText}
-              onChange={(e) => setFormData({ ...formData, imageSourceText: e.target.value })}
+              value={formData.imageSourceText || ""}
+              onChange={(e) => setValue("imageSourceText", e.target.value, { shouldValidate: true, shouldDirty: true })}
               className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             />
             <input
               type="url"
               placeholder="Link da fonte (https://...)"
-              value={formData.imageSourceUrl}
-              onChange={(e) => setFormData({ ...formData, imageSourceUrl: e.target.value })}
+              value={formData.imageSourceUrl || ""}
+              onChange={(e) => setValue("imageSourceUrl", e.target.value, { shouldValidate: true, shouldDirty: true })}
               className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-xs text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#ff6305]"
             />
           </div>
@@ -628,7 +702,7 @@ export function PostForm({
             </div>
 
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {formData.tags.map((tag) => (
+              {formData.tags && formData.tags.map((tag) => (
                 <span
                   key={tag}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-800 text-[11px] font-medium text-neutral-300"
