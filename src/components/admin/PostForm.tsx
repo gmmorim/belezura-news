@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import {
   ArrowLeft,
   Eye,
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { LivePreviewModal, PostFormData } from "@/components/admin/LivePreviewModal";
 import { TiptapEditor } from "@/components/admin/TiptapEditor";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { ControlledImageUpload } from "@/components/admin/ControlledImageUpload";
 
 export interface PostCategoryOption {
   id: string;
@@ -63,14 +63,7 @@ export function PostForm({
   const [authors, setAuthors] = useState<PostAuthorOption[]>(initialAuthors);
 
   // Integração com React Hook Form
-  const {
-    register,
-    setValue,
-    watch,
-    reset,
-    formState: { errors },
-    clearErrors,
-  } = useForm<PostFormData>({
+  const methods = useForm<PostFormData>({
     defaultValues: {
       title: "",
       subtitle: "",
@@ -88,6 +81,7 @@ export function PostForm({
     },
   });
 
+  const { setValue, watch, reset } = methods;
   const formData = watch();
 
   const [tagInput, setTagInput] = useState("");
@@ -266,7 +260,8 @@ export function PostForm({
   }
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-5xl mx-auto pb-16">
+    <FormProvider {...methods}>
+      <div className="space-y-6 sm:space-y-8 max-w-5xl mx-auto pb-16">
       {/* Topo: Navegação de Retorno e Ações Principais */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
         <div className="flex items-center gap-3">
@@ -487,170 +482,31 @@ export function PostForm({
             </p>
           </div>
 
-          {/* UPLOAD DE IMAGEM DESKTOP (UploadThing com React Hook Form e Feedback Visual) */}
-          <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-[#ff6305]" />
-                <label className="block text-xs font-bold uppercase tracking-wider text-white">
-                  Imagem de Capa (Desktop) <span className="text-[#ff6305]">*</span>
-                </label>
-              </div>
+          {/* UPLOAD DE IMAGEM DESKTOP (UploadThing Controlado) */}
+          <ControlledImageUpload
+            name="imageWeb"
+            label="Imagem de Capa (Desktop)"
+            required
+            icon={<Globe className="w-4 h-4 text-[#ff6305]" />}
+            aspectRatio="video"
+            onUploadSuccess={(url) => {
+              if (!watch("imageMobile")) {
+                setValue("imageMobile", url, { shouldValidate: true, shouldDirty: true });
+              }
+              setSubmitError(null);
+            }}
+          />
 
-              {formData.imageWeb && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  Imagem Carregada com Sucesso
-                </span>
-              )}
-            </div>
-
-            {formData.imageWeb ? (
-              <div className="space-y-3">
-                <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-emerald-500/40 bg-neutral-950 group shadow-lg">
-                  <img
-                    src={formData.imageWeb}
-                    alt="Preview Desktop"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setValue("imageWeb", "", { shouldValidate: true, shouldDirty: true });
-                      }}
-                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md transition-colors"
-                      title="Remover ou trocar imagem"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Trocar Imagem</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-neutral-400 px-1">
-                  <span className="truncate max-w-[260px]" title={formData.imageWeb}>
-                    {formData.imageWeb}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("imageWeb", "", { shouldValidate: true, shouldDirty: true });
-                    }}
-                    className="text-red-400 hover:text-red-300 font-medium ml-2 shrink-0"
-                  >
-                    Remover
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <UploadDropzone
-                  endpoint="postImageUploader"
-                  onClientUploadComplete={(res) => {
-                    const fileUrl = res?.[0]?.url || (res?.[0] as any)?.ufsUrl || (res?.[0] as any)?.appUrl || "";
-                    if (fileUrl) {
-                      setValue("imageWeb", fileUrl, { shouldValidate: true, shouldDirty: true });
-                      if (!watch("imageMobile")) {
-                        setValue("imageMobile", fileUrl, { shouldValidate: true, shouldDirty: true });
-                      }
-                      setSubmitError(null);
-                    }
-                  }}
-                  onUploadError={(error: Error) => {
-                    setSubmitError(`Erro no upload da imagem: ${error.message}`);
-                  }}
-                  className="border-neutral-800 bg-neutral-950/60 ut-label:text-[#ff6305] ut-button:bg-[#ff6305] ut-button:text-white rounded-xl py-6"
-                />
-                <input
-                  type="url"
-                  placeholder="Ou cole uma URL direta da imagem..."
-                  value={formData.imageWeb || ""}
-                  onChange={(e) => {
-                    setValue("imageWeb", e.target.value, { shouldValidate: true, shouldDirty: true });
-                    if (e.target.value) setSubmitError(null);
-                  }}
-                  className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-lg text-xs text-white placeholder-neutral-600 focus:outline-none focus:ring-1 focus:ring-[#ff6305]"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* UPLOAD DE IMAGEM MOBILE (UploadThing com React Hook Form e Feedback Visual) */}
-          <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-[#ff6305]" />
-                <label className="block text-xs font-bold uppercase tracking-wider text-white">
-                  Imagem Mobile (Opcional)
-                </label>
-              </div>
-
-              {formData.imageMobile && formData.imageMobile !== formData.imageWeb && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                  Imagem Mobile Carregada
-                </span>
-              )}
-            </div>
-
-            {formData.imageMobile && formData.imageMobile !== formData.imageWeb ? (
-              <div className="space-y-3">
-                <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden border border-emerald-500/40 bg-neutral-950 group shadow-lg">
-                  <img
-                    src={formData.imageMobile}
-                    alt="Preview Mobile"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setValue("imageMobile", "", { shouldValidate: true, shouldDirty: true });
-                      }}
-                      className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-md transition-colors"
-                      title="Remover ou trocar imagem mobile"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      <span>Trocar Imagem</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between text-[11px] text-neutral-400 px-1">
-                  <span className="truncate max-w-[260px]" title={formData.imageMobile}>
-                    {formData.imageMobile}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setValue("imageMobile", "", { shouldValidate: true, shouldDirty: true });
-                    }}
-                    className="text-red-400 hover:text-red-300 font-medium ml-2 shrink-0"
-                  >
-                    Remover
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <UploadDropzone
-                  endpoint="postImageUploader"
-                  onClientUploadComplete={(res) => {
-                    const fileUrl = res?.[0]?.url || (res?.[0] as any)?.ufsUrl || (res?.[0] as any)?.appUrl || "";
-                    if (fileUrl) {
-                      setValue("imageMobile", fileUrl, { shouldValidate: true, shouldDirty: true });
-                      setSubmitError(null);
-                    }
-                  }}
-                  onUploadError={(error: Error) => {
-                    setSubmitError(`Erro no upload mobile: ${error.message}`);
-                  }}
-                  className="border-neutral-800 bg-neutral-950/60 ut-label:text-[#ff6305] ut-button:bg-[#ff6305] ut-button:text-white rounded-xl py-6"
-                />
-              </div>
-            )}
-          </div>
+          {/* UPLOAD DE IMAGEM MOBILE (UploadThing Controlado) */}
+          <ControlledImageUpload
+            name="imageMobile"
+            label="Imagem Mobile (Opcional)"
+            icon={<Smartphone className="w-4 h-4 text-[#ff6305]" />}
+            aspectRatio="mobile"
+            onUploadSuccess={() => {
+              setSubmitError(null);
+            }}
+          />
 
           {/* Créditos da Imagem */}
           <div className="p-5 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-3">
@@ -729,5 +585,6 @@ export function PostForm({
         data={formData}
       />
     </div>
+    </FormProvider>
   );
 }
