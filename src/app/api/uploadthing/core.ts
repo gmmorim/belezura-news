@@ -8,24 +8,14 @@ export const ourFileRouter = {
       maxFileSize: "1GB",
       maxFileCount: 1,
     },
-    "image/jpeg": {
-      maxFileSize: "1GB",
-      maxFileCount: 1,
-    },
-    "image/png": {
-      maxFileSize: "1GB",
-      maxFileCount: 1,
-    },
-    "image/webp": {
-      maxFileSize: "1GB",
-      maxFileCount: 1,
-    },
   })
     .middleware(async () => {
-      return {};
+      // Middleware simplificado para isolar validações de sessão
+      return { userId: "admin-bypass" };
     })
-    .onUploadComplete(async ({ file }) => {
-      return { url: file.url };
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("[UploadThing] Upload concluído com sucesso:", file.url);
+      return { url: file.url, ufsUrl: (file as any).ufsUrl };
     }),
 } satisfies FileRouter;
 

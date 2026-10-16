@@ -1,6 +1,9 @@
 import React, { Suspense } from "react";
 import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className="min-h-screen w-full overflow-x-hidden flex flex-col font-sans selection:bg-[#ff6305] selection:text-white bg-[#FAF9F6]">
+        <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>

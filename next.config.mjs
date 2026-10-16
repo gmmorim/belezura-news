@@ -7,7 +7,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' blob: data: https:;
   font-src 'self' https://fonts.gstatic.com data:;
-  connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;
+  connect-src 'self' https://uploadthing.com https://*.uploadthing.com https://*.ingest.uploadthing.com https://ufs.sh https://*.ufs.sh https://utfs.io https://*.amazonaws.com https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com;
   frame-ancestors 'none';
   form-action 'self' mailto:;
   base-uri 'self';

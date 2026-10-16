@@ -120,6 +120,7 @@ export function ControlledImageUpload({
             endpoint="postImageUploader"
             onClientUploadComplete={handleUploadComplete}
             onUploadError={(error: Error) => {
+              console.error("[UPLOADTHING_ERROR]", error);
               alert(`Erro no upload da imagem: ${error.message}`);
             }}
             className="border-neutral-800 bg-neutral-950/60 ut-label:text-[#ff6305] ut-button:bg-[#ff6305] ut-button:text-white rounded-xl py-6"
